@@ -1,7 +1,5 @@
 # this is a comment
 #keep *
 drop *
-keep SV*
-keep GenPart*
-keep FatJet*
-keep FatJetPFCands*
+keep *
+drop FatJetPFCands*

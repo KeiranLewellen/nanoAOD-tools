@@ -4,15 +4,15 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 from array import array
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection 
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
-from tensorflow.keras.models import load_model
+from keras.models import load_model
 
 class inferencerClass(Module):
     def __init__(self, jetSelection):
         self.jetSel = jetSelection
         self.Nparts = 20
         self.Nsvs   = 5
-        self.model = load_model('/uscms/home/jkrupa/nobackup/subjetNN/CMSSW_10_2_11/src/PandaAnalysis/dazsle-tagger/evt/nanofiles/deepJet-v8/v25/weights_gru.h5')
-
+        self.model_GRU = load_model('/uscms/home/jkrupa/nobackup/subjetNN/CMSSW_10_2_11/src/PandaAnalysis/dazsle-tagger/evt/nanofiles/deepJet-v8/v25/weights_gru.h5')
+        self.model_IN  = load_model('/uscms/home/jkrupa/nobackup/zprlegacy/CMSSW_10_6_6/src/PhysicsTools/NanoAODTools/weights_IN.h5')
     def beginJob(self):
         pass
     def endJob(self):
@@ -20,7 +20,7 @@ class inferencerClass(Module):
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
 
-        self.out.branch("fj_tagger", "F", 1)
+        self.out.branch("gru_v25", "F", 1)
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -30,13 +30,12 @@ class inferencerClass(Module):
         pfcands	 = Collection(event, "FatJetPFCands")
         jets 	 = Collection(event, "FatJet")
    
-        tagger = np.full(1,-1.)
-        print('hi')
+        tagger_GRU = np.full(1,-1.)
+        tagger_IN  = np.full(1,-1.)
         for ij, jet in enumerate(jets):
-            print(ij)
 
             if jet.pt < 525 or jet.msoftdrop < 40 : continue
-
+            if ij>0 : continue
             ##basic jet properties
             jpt    = jet.pt
             jeta   = jet.eta
@@ -68,12 +67,14 @@ class inferencerClass(Module):
             ##define and reshape features
             X = np.vstack([pfpt,pfeta,pfphi,pfdz,pfd0])
             X = np.reshape(X,(X.shape[0],self.Nparts)).T
-            print(X)
             X = np.reshape(X,(1,X.shape[0],X.shape[1]))
  
-            tagger[ij] = float(self.model.predict(X)[0,0])
-            print(str(ij)+' tagger = %.2f'%tagger[ij])   
-	self.out.fillBranch("fj_tagger",tagger)
+
+            tagger_GRU[ij] = float(self.model_GRU.predict(X)[0,1])
+            tagger_IN[ij]  = float(self.model_IN.predict(X)[0,1])
+            #assert abs( 1 - float(self.model.predict(X)[0,1]) - float(self.model.predict(X)[0,0])) < 0.02
+	self.out.fillBranch("GRU_v25",tagger_GRU)
+	self.out.fillBranch("IN_v25",tagger_IN)
         return True
 
 
