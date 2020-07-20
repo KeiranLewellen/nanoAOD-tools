@@ -16,25 +16,25 @@ class PostProcessor :
     def __init__(self,outputDir,inputFiles,cut=None,branchsel=None,modules=[],compression="LZMA:9",friend=False,postfix=None,
 		 jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None, outputbranchsel=None,maxEntries=None,firstEntry=0,
 		 prefetch=False,longTermCache=False):
-	self.outputDir=outputDir
-	self.inputFiles=inputFiles
-	self.cut=cut
-	self.modules=modules
-	self.compression=compression
-	self.postfix=postfix
-	self.json=jsonInput
-	self.noOut=noOut
-	self.friend=friend
-	self.justcount=justcount
-	self.provenance=provenance
-	self.jobReport = JobReport() if fwkJobReport else None
-	self.haddFileName=haddFileName
-	self.histFile = None
-	self.histDirName = None
-	if self.jobReport and not self.haddFileName :
-		print "Because you requested a FJR we assume you want the final hadd. No name specified for the output file, will use tree.root"
-		self.haddFileName="tree.root"
- 	self.branchsel = BranchSelection(branchsel) if branchsel else None 
+        self.outputDir=outputDir
+        self.inputFiles=inputFiles
+        self.cut=cut
+        self.modules=modules
+        self.compression=compression
+        self.postfix=postfix
+        self.json=jsonInput
+        self.noOut=noOut
+        self.friend=friend
+        self.justcount=justcount
+        self.provenance=provenance
+        self.jobReport = JobReport() if fwkJobReport else None
+        self.haddFileName=haddFileName
+        self.histFile = None
+        self.histDirName = None
+        if self.jobReport and not self.haddFileName :
+                print ("Because you requested a FJR we assume you want the final hadd. No name specified for the output file, will use tree.root")
+                self.haddFileName="tree.root"
+        self.branchsel = BranchSelection(branchsel) if branchsel else None 
         self.outputbranchsel = BranchSelection(outputbranchsel) if outputbranchsel else None
         self.histFileName=histFileName
         self.histDirName=histDirName
@@ -49,18 +49,18 @@ class PostProcessor :
         rndchars  = "".join([hex(ord(i))[2:] for i in os.urandom(8)]) if not self.longTermCache else "long_cache-id%d-%s" % (os.getuid(), hashlib.sha1(fname).hexdigest());
         localfile = "%s/%s-%s.root" % (tmpdir, os.path.basename(fname).replace(".root",""), rndchars)
         if self.longTermCache and os.path.exists(localfile):
-            if verbose: print "Filename %s is already available in local path %s " % (fname,localfile) 
+            if verbose: print ("Filename %s is already available in local path %s " % (fname,localfile) ) 
             return localfile, False
         try:
-            if verbose: print "Filename %s is remote, will do a copy to local path %s " % (fname,localfile) 
+            if verbose: print ("Filename %s is remote, will do a copy to local path %s " % (fname,localfile) ) 
             start = time.clock()
             subprocess.check_output(["xrdcp","-f","-N",fname,localfile])
-            if verbose: print "Time used for transferring the file locally: %s s" % (time.clock() - start) 
+            if verbose: print ("Time used for transferring the file locally: %s s" % (time.clock() - start) )
             return localfile, (not self.longTermCache)
         except:
-            if verbose: print "Error: could not save file locally, will run from remote" 
+            if verbose: print ("Error: could not save file locally, will run from remote" )
             if os.path.exists(localfile):
-                if verbose: print "Deleting partially transferred file %s" % localfile
+                if verbose: print ("Deleting partially transferred file %s" % localfile)
                 try:
                     os.unlink(localfile)
                 except:
@@ -80,7 +80,7 @@ class PostProcessor :
                 else: raise RuntimeError("Unsupported compression %s" % algo)
             else:
                 compressionLevel = 0 
-	    print "Will write selected trees to "+self.outputDir
+	    print ("Will write selected trees to "+self.outputDir)
             if not self.justcount:
                 if not os.path.exists(self.outputDir):
                     os.system("mkdir -p "+self.outputDir)
@@ -131,12 +131,12 @@ class PostProcessor :
 	    # pre-skimming
 	    elist,jsonFilter = preSkim(inTree, self.json, self.cut, maxEntries = self.maxEntries, firstEntry = self.firstEntry)
 	    if self.justcount:
-		print 'Would select %d / %d entries from %s (%.2f%%)'%(elist.GetN() if elist else nEntries, nEntries, fname, (elist.GetN() if elist else nEntries)/(0.01*nEntries) if nEntries else 0)
+		print ('Would select %d / %d entries from %s (%.2f%%)'%(elist.GetN() if elist else nEntries, nEntries, fname, (elist.GetN() if elist else nEntries)/(0.01*nEntries) if nEntries else 0))
 		if self.prefetch:
 		    if toBeDeleted: os.unlink(ftoread)
 		continue
 	    else:
-		print 'Pre-select %d entries out of %s (%.2f%%)'%(elist.GetN() if elist else nEntries,nEntries,(elist.GetN() if elist else nEntries)/(0.01*nEntries) if nEntries else 0)
+		print ('Pre-select %d entries out of %s (%.2f%%)'%(elist.GetN() if elist else nEntries,nEntries,(elist.GetN() if elist else nEntries)/(0.01*nEntries) if nEntries else 0))
 		inAddFiles = []
 		inAddTrees = []
 	    for ffname in ffnames:
@@ -185,16 +185,16 @@ class PostProcessor :
 	    if not fullClone:
                 eventRange = xrange(self.firstEntry, self.firstEntry + nEntries) if nEntries > 0 and not elist else None
 		(nall, npass, timeLoop) = eventLoop(self.modules, inFile, outFile, inTree, outTree, eventRange=eventRange, maxEvents=self.maxEntries)
-		print 'Processed %d preselected entries from %s (%s entries). Finally selected %d entries' % (nall, fname, nEntries, npass)
+		print ('Processed %d preselected entries from %s (%s entries). Finally selected %d entries' % (nall, fname, nEntries, npass))
 	    else:
                 nall = nEntries
-		print 'Selected %d / %d entries from %s (%.2f%%)' % (outTree.tree().GetEntries(), nall, fname, outTree.tree().GetEntries()/(0.01*nall) if nall else 0)
+		print ('Selected %d / %d entries from %s (%.2f%%)' % (outTree.tree().GetEntries(), nall, fname, outTree.tree().GetEntries()/(0.01*nall) if nall else 0))
 
 	    # now write the output
             if not self.noOut: 
                 outTree.write()
                 outFile.Close()
-                print "Done %s" % outFileName
+                print ("Done %s" % outFileName)
 	    if self.jobReport:
 		self.jobReport.addInputFile(fname,nall)
 	    if self.prefetch:
@@ -202,7 +202,7 @@ class PostProcessor :
 		
 	for m in self.modules: m.endJob()
 	
-	print  totEntriesRead/(time.clock()-t0), "Hz"
+	print  (totEntriesRead/(time.clock()-t0), "Hz")
 
 
 	if self.haddFileName :

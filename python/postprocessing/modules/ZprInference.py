@@ -11,8 +11,8 @@ class inferencerClass(Module):
         self.jetSel = jetSelection
         self.Nparts = 20
         self.Nsvs   = 5
-        self.model_GRU = load_model('/uscms/home/jkrupa/nobackup/subjetNN/CMSSW_10_2_11/src/PandaAnalysis/dazsle-tagger/evt/nanofiles/deepJet-v8/v25/weights_gru.h5')
-        self.model_IN  = load_model('/uscms/home/jkrupa/nobackup/zprlegacy/CMSSW_10_6_6/src/PhysicsTools/NanoAODTools/weights_IN.h5')
+        self.model_GRU = load_model('/uscms/home/jkrupa/nobackup/zprlegacy/inferencer2/NanoAODTools/data/weights_gru.h5')
+        self.model_IN  = load_model('/uscms/home/jkrupa/nobackup/zprlegacy/inferencer2/NanoAODTools/data/weights_IN.h5')
     def beginJob(self):
         pass
     def endJob(self):
