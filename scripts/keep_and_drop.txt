@@ -1,6 +1,7 @@
 # this is a comment
 #keep *
 drop *
-keep Muon*
-keep Electron*
-keep Jet*
+keep SV*
+keep GenPart*
+keep FatJet*
+keep FatJetPFCands*

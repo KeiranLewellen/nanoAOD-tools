@@ -1,2 +1,6 @@
 # this is a comment
+#keep *
 drop *
+#keep GenPart*
+keep PF_*
+keep fj_* 
