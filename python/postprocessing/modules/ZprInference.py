@@ -5,14 +5,16 @@ from array import array
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection 
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from keras.models import load_model
-
+import os
 class inferencerClass(Module):
     def __init__(self, jetSelection):
         self.jetSel = jetSelection
         self.Nparts = 20
         self.Nsvs   = 5
-        self.model_GRU = load_model('/uscms/home/jkrupa/nobackup/subjetNN/CMSSW_10_2_11/src/PandaAnalysis/dazsle-tagger/evt/nanofiles/deepJet-v8/v25/weights_gru.h5')
-        self.model_IN  = load_model('/uscms/home/jkrupa/nobackup/zprlegacy/CMSSW_10_6_6/src/PhysicsTools/NanoAODTools/weights_IN.h5')
+        base = os.environ['CMSSW_BASE']
+        self.model_GRU = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/weights_gru.h5')
+        #self.model_GRU = load_model('/uscms/home/jkrupa/nobackup/subjetNN/CMSSW_10_2_11/src/PandaAnalysis/dazsle-tagger/evt/nanofiles/deepJet-v8/v25/weights_gru.h5')
+        self.model_IN  = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/weights_IN2.h5')
     def beginJob(self):
         pass
     def endJob(self):
@@ -20,7 +22,8 @@ class inferencerClass(Module):
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
 
-        self.out.branch("gru_v25", "F", 1)
+        self.out.branch("GRU_v25", "F", 1)
+        self.out.branch("IN_v3", "F", 1)
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -74,7 +77,7 @@ class inferencerClass(Module):
             tagger_IN[ij]  = float(self.model_IN.predict(X)[0,1])
             #assert abs( 1 - float(self.model.predict(X)[0,1]) - float(self.model.predict(X)[0,0])) < 0.02
 	self.out.fillBranch("GRU_v25",tagger_GRU)
-	self.out.fillBranch("IN_v25",tagger_IN)
+	self.out.fillBranch("IN_v3",tagger_IN)
         return True
 
 
