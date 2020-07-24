@@ -6,6 +6,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collect
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from keras.models import load_model
 import os
+import tensorflow as tf
 class inferencerClass(Module):
     def __init__(self, jetSelection):
         self.jetSel = jetSelection
@@ -14,7 +15,7 @@ class inferencerClass(Module):
         base = os.environ['CMSSW_BASE']
         self.model_GRU = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/weights_gru.h5')
         #self.model_GRU = load_model('/uscms/home/jkrupa/nobackup/subjetNN/CMSSW_10_2_11/src/PandaAnalysis/dazsle-tagger/evt/nanofiles/deepJet-v8/v25/weights_gru.h5')
-        self.model_IN  = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/weights_IN2.h5')
+        self.model_IN  = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/weights_IN_v101.h5', custom_objects={'tf': tf})
     def beginJob(self):
         pass
     def endJob(self):
