@@ -25,40 +25,6 @@ def ismc(dataset):
     return True
     
 
-def short_name(dataset):
-    _, name, conditions, _ = dataset.split("/")
-
-    # Remove useless info
-    name = name.replace("_TuneCP5","")
-    name = name.replace("_TuneCUETP8M1","")
-    name = name.replace("_13TeV","")
-    name = name.replace("-pythia8","")
-    name = name.replace("madgraphMLM","MLM")
-    name = name.replace("madgraph","mg")
-    name = name.replace("amcnloFXFX","FXFX")
-    name = name.replace("powheg","pow")
-
-    # Detect extension
-    m=re.match(r".*(ext\d+).*",conditions);
-    if m:
-        name = name + "_" + m.groups()[0]
-    m=re.match(r".*(ver\d+).*",conditions);
-    if m:
-        name = name + "_" + m.groups()[0]
-    if 'new_pmx' in conditions:
-        name = name + '_new_pmx'
-    if 'RunIISummer16' in conditions:
-        name = name + "_2016"
-    elif "RunIIFall17" in conditions:
-        name = name + "_2017"
-    elif 'RunIIAutumn18' in conditions:
-        name = name + "_2018"
-
-    m = re.match(r"Run(\d+[A-Z]*)", conditions)
-    if m:
-        name = name + "_" + m.groups()[0]
-
-    return name
 
 def setup_dirs(datasets, tag):
     
@@ -81,7 +47,7 @@ def setup_dirs(datasets, tag):
    
     # Loop over datasets
     for item in datasets:
-      if 'WJetsToLNu_HT' in item['dataset']: # or 'SingleMuon' in item['dataset']:
+        #if 'WJetsToLNu_HT' in item['dataset']: # or 'SingleMuon' in item['dataset']:
         shortname = item['dataset']
         print 'Submitting sample %s'%shortname 
         outdir = "/store/user/lpcbacon/jkrupa/nanopost_process/%s/%s"%(tag, shortname)
