@@ -34,12 +34,13 @@ class inferencerClass(Module):
         pfcands	 = Collection(event, "FatJetPFCands")
         jets 	 = Collection(event, "FatJet")
    
-        tagger_GRU = np.full(1,-1.)
-        tagger_IN  = np.full(1,-1.)
+        tagger_GRU = np.full(1,-1.,dtype=np.float32)
+        tagger_IN  = np.full(1,-1.,dtype=np.float32)
         for ij, jet in enumerate(jets):
 
-            if jet.pt < 525 or jet.msoftdrop < 40 : continue
+            #if jet.pt < 400 or jet.msoftdrop < 30 : continue
             if ij>0 : continue
+            if jet.nPFConstituents< 1: continue
             ##basic jet properties
             jpt    = jet.pt
             jeta   = jet.eta
@@ -58,6 +59,7 @@ class inferencerClass(Module):
             ##fill normalized to 
             ##nominal features: pt, eta, phi, dz, d0
             arrIdx = 0
+            #print(len(pfcands), len(candrange))
             for ip, part in enumerate(pfcands):
                 if arrIdx == self.Nparts: break
                 if ip not in candrange: continue
@@ -67,7 +69,7 @@ class inferencerClass(Module):
                 pfdz[arrIdx]  = part.dz
                 pfd0[arrIdx]  = part.d0
                 arrIdx += 1
-
+            #print(pfpt,pfeta,pfphi,pfdz,pfd0)
             ##define and reshape features
             X = np.vstack([pfpt,pfeta,pfphi,pfdz,pfd0])
             X = np.reshape(X,(X.shape[0],self.Nparts)).T
@@ -77,6 +79,7 @@ class inferencerClass(Module):
             tagger_GRU[ij] = float(self.model_GRU.predict(X)[0,1])
             tagger_IN[ij]  = float(self.model_IN.predict(X)[0,1])
             #assert abs( 1 - float(self.model.predict(X)[0,1]) - float(self.model.predict(X)[0,0])) < 0.02
+            #print(X,tagger_GRU[ij], tagger_IN[ij])
 	self.out.fillBranch("GRU_v25",tagger_GRU)
 	self.out.fillBranch("IN_v3",tagger_IN)
         return True
@@ -91,5 +94,5 @@ def signedDeltaPhi(phi1,phi2):
        dPhi = -2*np.pi+dPhi
     return dPhi
 
-inferencer = lambda : inferencerClass(jetSelection= lambda j : j.pt >= 400. and j.msoftdrop >= 40.) 
+inferencer = lambda : inferencerClass(jetSelection= lambda j : j.pt >= 0.)# and j.msoftdrop >= 40.) 
  
