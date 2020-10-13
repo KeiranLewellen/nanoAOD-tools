@@ -6,12 +6,14 @@ eosbase = "root://cmseos.fnal.gov/"
 eosdir = "/store/group/lpcbacon/pancakes/02/"
 
 dirlist = [
-    ["2017/UL/", "2017",["hadd","MET","DYJets","GluGlu","Electron","WJetsToLNu","WW","WZ","ZZ","JetHT/pancakes-02_Run2017B", "QCD_HT100to200", "QCD_HT200to300","QCD_HT50to100","SingleMuon","JetHT"],{"SingleMuon":"withPF",},],
+    ["2017/UL/", "2017",["hadd","MET","DYJets","GluGlu","Electron","WJetsToLNu","WW","WZ","ZZ","JetHT/pancakes-02_Run2017B", "QCD_HT100to200", "QCD_HT200to300","QCD_HT50to100","SingleMuon","JetHT","SingleElectron","Tau"],{"SingleMuon":"withPF",},],
     ["2017/tmp-VJets-withPF", "2017",["UL"], {},],#["tmp-VJets-withPF"]],
     ["2017/tmp-VJets-withPF/UL", "2017",[], {},],#["tmp-VJets-withPF"]],
     ["2017/tmp-WJets-withPF", "2017",[], {},],#["tmp-VJets-withPF"]],
     ["2017/UL/SingleMuon","2017",[],{"SingleMuon":"withPF"}],
     ["2017/UL/JetHT","2017",[],{}], 
+    #["2017/UL/Tau","2017",[],{}], 
+    #["2017/UL/SingleElectron","2017",[],{}], 
     #["2018/UL", "2018UL",["200211_180642"]],
     #["2017/UL/hadd", "2017ULhadd",["_Run2017B"]]
     #["","2017",[]]   
@@ -50,6 +52,8 @@ for dirs in dirlist:
         name = s
         if 'SingleMuon' in curdir: name = 'SingleMuon_' + name
         if 'JetHT' in curdir: name = 'JetHT_' + name
+        if 'Tau' in curdir: name = 'Tau_' + name
+        if 'SingleElectron' in curdir: name = 'SingleElectron_' + name
 
         requirements = ""
         for k,v in dirs[3].items():
@@ -72,6 +76,7 @@ for dirs in dirlist:
             jdict[s] = [eosbase+d for d in dirlog]
         #print(jdict[s])
 
+        os.system('mkdir -p %s'%dirs[1])
         out = open('%s/%s.txt'%(dirs[1], name),'w')
         for f in jdict[s]:
              #if not any(skip in f for skip in dirs[2]):

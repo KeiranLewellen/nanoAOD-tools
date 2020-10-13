@@ -19,7 +19,10 @@ def chunkify(items, nchunk):
     return chunks
 
 def year(dataset):
-    return 2017 
+    if ('GluGluHToTauTau' in dataset):
+        return 2018
+    else:
+        return 2017 
 
 def ismc(dataset):
     return True
