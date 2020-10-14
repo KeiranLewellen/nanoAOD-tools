@@ -2,7 +2,7 @@ import ROOT
 import numpy as np
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 from array import array
-from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection 
+from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from keras.models import load_model
 import os
@@ -33,7 +33,7 @@ class inferencerClass(Module):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         pfcands	 = Collection(event, "FatJetPFCands")
         jets 	 = Collection(event, "FatJet")
-	sv       = Collection(event, "SV")
+	svs      = Collection(event, "SV")
 	met      = Object(event, "MET")
    
         tagger_GRU = np.full(1,-1.,dtype=np.float32)
@@ -103,7 +103,7 @@ class inferencerClass(Module):
             sveta = np.zeros(self.Nsvs, dtype = np.float16)
             svv = ROOT.TLorentzVector()
             arrIdx = 0
-            for isv, sv in enumerate(SV):
+            for isv, sv in enumerate(svs):
                 if arrIdx == self.Nsvs: break
                 svv.SetPtEtaPhiM(sv.pt, sv.eta, sv.phi, sv.mass)
                 if jetv.DeltaR(svv) < 0.8:
