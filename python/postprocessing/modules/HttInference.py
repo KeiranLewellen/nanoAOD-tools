@@ -10,7 +10,7 @@ import tensorflow as tf
 class inferencerClass(Module):
     def __init__(self, jetSelection):
         self.jetSel = jetSelection
-        self.Nparts = 30
+        self.Nparts = 20
         self.Nsvs   = 5
         base = os.environ['CMSSW_BASE']
         self.model_GRU = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/weights_gru.h5')
