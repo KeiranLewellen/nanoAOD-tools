@@ -117,7 +117,7 @@ def setup_dirs(datasets, tag):
                 f.write("\nqueue 1\n")
   
             os.system('condor_submit %s'%jobfile)
-            break
+            
 
 def main():
     tag = 'Oct13'
