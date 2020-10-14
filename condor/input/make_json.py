@@ -1,7 +1,5 @@
 import json, glob
 
-year = '2017'
-
 mergefactors = { "JetHT_pancakes-02_Run2017B-09Aug2019_UL2017-v1" : 10,
                  "JetHT_pancakes-02_Run2017C-09Aug2019_UL2017-v1" : 10,
                  "JetHT_pancakes-02_Run2017D-09Aug2019_UL2017-v1" : 10,
@@ -55,16 +53,21 @@ mergefactors = { "JetHT_pancakes-02_Run2017B-09Aug2019_UL2017-v1" : 10,
                  "WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8" : 5,  
                  "WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8" : 5,  
                  "WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8" : 5,  
+                 "GluGluHTauTau_13TeV" : 20,
                 } 
-of = open('fileset_%s.json'%year,'w')
-of.write('[\n')
-for i, s in enumerate(glob.glob(year+'/*')):
-
-
-    of.write('\n\t{')
-    of.write('"dataset" : "%s",\n'%s.replace('.txt','').replace(year+'/',''))
-    of.write('\t"filelist" : "input/%s",\n'%s)
-
-    of.write('\t"mergefactor" : %i\n\t},'%mergefactors[s.replace('.txt','').replace(year+'/','')])
-of.write('\n]')
-of.close()
+for year in ['2017','2018']:
+    of = open('fileset_%s.json'%year,'w')
+    of.write('[\n')
+    endi = len(glob.glob(year+'/*'))-1
+    for i, s in enumerate(glob.glob(year+'/*')):
+    
+    
+        of.write('\n\t{')
+        of.write('"dataset" : "%s",\n'%s.replace('.txt','').replace(year+'/',''))
+        of.write('\t"filelist" : "input/%s",\n'%s)
+    
+        comma = ","
+        if (i==endi): comma = ""
+        of.write('\t"mergefactor" : %i\n\t}%s'%(mergefactors[s.replace('.txt','').replace(year+'/','')],comma))
+    of.write('\n]')
+    of.close()

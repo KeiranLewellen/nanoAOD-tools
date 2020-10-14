@@ -1,0 +1,7 @@
+[
+
+	{"dataset" : "GluGluHTauTau_13TeV",
+	"filelist" : "input/2018/GluGluHTauTau_13TeV.txt",
+	"mergefactor" : 20
+	}
+]

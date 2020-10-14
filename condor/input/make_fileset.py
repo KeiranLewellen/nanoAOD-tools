@@ -6,6 +6,7 @@ eosbase = "root://cmseos.fnal.gov/"
 eosdir = "/store/group/lpcbacon/pancakes/02/"
 
 dirlist = [
+    #["2017/UL/", "2017",["hadd","MET","DYJets","GluGlu","Electron","WJetsToLNu","WW","WZ","ZZ","JetHT/pancakes-02_Run2017B", "QCD_HT100to200", "QCD_HT200to300","QCD_HT50to100","SingleMuon","JetHT","SingleElectron","Tau"],{"SingleMuon":"withPF",},],
     ["2017/UL/", "2017",["hadd","MET","DYJets","GluGlu","Electron","WJetsToLNu","WW","WZ","ZZ","JetHT/pancakes-02_Run2017B", "QCD_HT100to200", "QCD_HT200to300","QCD_HT50to100","SingleMuon","JetHT","SingleElectron","Tau"],{"SingleMuon":"withPF",},],
     ["2017/tmp-VJets-withPF", "2017",["UL"], {},],#["tmp-VJets-withPF"]],
     ["2017/tmp-VJets-withPF/UL", "2017",[], {},],#["tmp-VJets-withPF"]],
@@ -17,6 +18,7 @@ dirlist = [
     #["2018/UL", "2018UL",["200211_180642"]],
     #["2017/UL/hadd", "2017ULhadd",["_Run2017B"]]
     #["","2017",[]]   
+    ["2018/UL/GluGluHTauTau_13TeV_user", "2018",[], {},],
 ]
 
 def eos_rec_search(startdir,suffix,skiplist,dirs,reqs=""):
@@ -49,11 +51,12 @@ for dirs in dirlist:
         if any(skip in s for skip in dirs[2]): continue #print('skipping',s);  continue
         print("\tRunning on %s"%s)
         curdir = "%s%s/%s/"%(eosdir,dirs[0],s)
-        name = s
+        name = s.replace('crab_','').replace('_user','')
         if 'SingleMuon' in curdir: name = 'SingleMuon_' + name
         if 'JetHT' in curdir: name = 'JetHT_' + name
-        if 'Tau' in curdir: name = 'Tau_' + name
+        if 'Tau' in curdir and 'TauTau' not in curdir: name = 'Tau_' + name
         if 'SingleElectron' in curdir: name = 'SingleElectron_' + name
+        
 
         requirements = ""
         for k,v in dirs[3].items():
