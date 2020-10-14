@@ -87,6 +87,7 @@ class inferencerClass(Module):
             try: jLStau43 = float(jet.LStau4)/float(jet.LStau3)
             except: jLStau43 = 0.
 
+            jetv = ROOT.TLorentzVector()
             jetv.SetPtEtaPhiM(jet.pt, jet.eta, jet.phi, jet.mass)
 
             ##Fill SV
