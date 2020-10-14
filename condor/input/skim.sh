@@ -88,7 +88,7 @@ echo "${FILES[@]}"
 echo "${CUT}"
 
 echo "start python $(date)"
-python scripts/nano_postproc.py tmp/ ${FILES[@]} -I PhysicsTools.NanoAODTools.postprocessing.modules.ZprInference inferencer -c "${CUT}" -s "${DATASET}"
+python scripts/nano_postproc.py tmp/ ${FILES[@]} -I PhysicsTools.NanoAODTools.postprocessing.modules.HttInference inferencer -c "${CUT}" -s "${DATASET}"
 echo "done python $(date)"
 #OUTDIR="/store/user/jkrupa/nanopost_process/${TAG}" 
 #/$(echo $DATASET | sed "s|/| |g" | awk '{print $1}')/${SHORT}/${SUBDATE}/1337/"

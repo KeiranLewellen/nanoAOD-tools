@@ -52,8 +52,8 @@ def setup_dirs(datasets, tag):
     for item in datasets:
         #if 'WJetsToLNu_HT' in item['dataset']: # or 'SingleMuon' in item['dataset']:
         shortname = item['dataset']
-        print 'Submitting sample %s'%shortname 
-        outdir = "/store/user/lpcbacon/jkrupa/nanopost_process/%s/%s"%(tag, shortname)
+        print('Submitting sample %s'%shortname)
+        outdir = "/store/user/lpcbacon/drankin/nanopost_process/%s/%s"%(tag, shortname)
 
 
         os.system("eos root://cmseos.fnal.gov/ mkdir -p %s"%outdir) 
@@ -71,7 +71,7 @@ def setup_dirs(datasets, tag):
             files = [x.strip() for x in f.readlines()]
         cut='(1==1)' #cut = '(FatJet_msoftdrop[0]>30.)&&(FatJet_pt[0]>450.)'
         if 'JetHT' in shortname: cut += '&&(event%10==0)'
-        print 'Preparing %i jobs with %i files per job'%(int(math.ceil(len(files) / item['mergefactor'])), item['mergefactor'])
+        print('Preparing %i jobs with %i files per job'%(int(math.ceil(len(files) / item['mergefactor'])), item['mergefactor']))
         for ichunk, chunk in enumerate( chunkify(files, int(math.ceil(len(files) / item['mergefactor'])))):
             input_files = [
                 gp,
@@ -117,11 +117,16 @@ def setup_dirs(datasets, tag):
                 f.write("\nqueue 1\n")
   
             os.system('condor_submit %s'%jobfile)
+            break
 
 def main():
-    tag = '6Aug20'
-    with open("input/fileset_2017.json") as f:
-        datasets = json.loads(f.read())
+    tag = 'Oct13'
+    #with open("input/fileset_2017.json","r") as f:
+    #    datasets_2017 = json.loads(f.read())
+    datasets_2017 = []
+    with open("input/fileset_2018.json","r") as f:
+        datasets_2018 = json.loads(f.read())
+    datasets = datasets_2017 + datasets_2018
 
     setup_dirs(datasets, tag)
 
