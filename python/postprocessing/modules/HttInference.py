@@ -15,7 +15,7 @@ class inferencerClass(Module):
         base = os.environ['CMSSW_BASE']
         self.model_GRU = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/weights_gru.h5')
         #self.model_GRU = load_model('/uscms/home/jkrupa/nobackup/subjetNN/CMSSW_10_2_11/src/PandaAnalysis/dazsle-tagger/evt/nanofiles/deepJet-v8/v25/weights_gru.h5')
-        self.model_IN  = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/weights_IN_v101.h5', custom_objects={'tf': tf})
+        self.model_IN  = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/weights_IN.h5', custom_objects={'tf': tf})
     def beginJob(self):
         pass
     def endJob(self):
@@ -34,21 +34,28 @@ class inferencerClass(Module):
         pfcands	 = Collection(event, "FatJetPFCands")
         jets 	 = Collection(event, "FatJet")
 	sv       = Collection(event, "SV")
-	met      = Collection(event, "MET")
+	met      = Object(event, "MET")
    
         tagger_GRU = np.full(1,-1.,dtype=np.float32)
         tagger_IN  = np.full(1,-1.,dtype=np.float32)
 
-        jet_idx = signedDeltaPhi(met.phi, jets.phi).argmin()
+        jet_idx = 0
+        min_dphi = 999.
+        for ij, jet in enumerate(jets):
+            if (jet.pt < 300.): continue
+            this_dphi = abs(signedDeltaPhi(met.phi, jet.phi))
+            if (this_dphi < min_dphi):
+                min_dphi = this_dphi
+                jet_idx = ij
         pf_idx = 0
 
         for ij, jet in enumerate(jets):
 
             #if jet.pt < 400 or jet.msoftdrop < 30 : continue
-            if ( ij < (jet_idx-1) ):
+            if ( ij < jet_idx ):
                pf_idx = pf_idx + jet.nPFConstituents
                continue
-            elif ( ij >= jet_idx ): 
+            elif ( ij > jet_idx ): 
                continue
             if jet.nPFConstituents< 1: continue
             ##Fill basic jet properties
