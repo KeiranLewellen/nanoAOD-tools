@@ -120,7 +120,7 @@ def setup_dirs(datasets, tag):
             
 
 def main():
-    tag = 'Oct13'
+    tag = 'Jan11'
     #with open("input/fileset_2017.json","r") as f:
     #    datasets_2017 = json.loads(f.read())
     datasets_2017 = []
