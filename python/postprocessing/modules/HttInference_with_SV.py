@@ -79,9 +79,9 @@ class inferencerClass(Module):
         RV=np.float32(RV)
         RVT=np.transpose(RV)
 
-        self.model4p1_hadhad = load_model("/uscms/home/keiran/work/CMSSW_10_6_6/src/PhysicsTools/NanoAODTools/data/deepDoubleTau_hadhad_v4.1,model.h5",custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
-        self.model6p1_hadel = load_model("/uscms/home/keiran/work/CMSSW_10_6_6/src/PhysicsTools/NanoAODTools/data/deepDoubleTau_hadel_v6.1,model.h5",custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
-        self.model6p1_hadmu = load_model("/uscms/home/keiran/work/CMSSW_10_6_6/src/PhysicsTools/NanoAODTools/data/deepDoubleTau_hadmu_v6.1,model.h5",custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
+        self.model4p1_hadhad = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/deepDoubleTau_hadhad_v4.1,model.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
+        self.model6p1_hadel = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/deepDoubleTau_hadel_v6.1,model.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
+        self.model6p1_hadmu = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/deepDoubleTau_hadmu_v6.1,model.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
 
     def beginJob(self):
         pass
