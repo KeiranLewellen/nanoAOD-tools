@@ -70,7 +70,7 @@ def setup_dirs(datasets, tag):
         with open(str(item['filelist'])) as f:
             files = [x.strip() for x in f.readlines()]
         cut='(1==1)' #cut = '(FatJet_msoftdrop[0]>30.)&&(FatJet_pt[0]>450.)'
-        if 'JetHT' in shortname: cut += '&&(event%10==0)'
+        #if 'JetHT' in shortname: cut += '&&(event%10==0)'
         print('Preparing %i jobs with %i files per job'%(int(math.ceil(len(files) / item['mergefactor'])), item['mergefactor']))
         for ichunk, chunk in enumerate( chunkify(files, int(math.ceil(len(files) / item['mergefactor'])))):
             input_files = [
@@ -104,7 +104,7 @@ def setup_dirs(datasets, tag):
                 "WhenToTransferOutput" : "ON_EXIT_OR_EVICT",
                 "universe" : "vanilla",
                 "request_cpus" : 1,
-                "request_memory" : 1000,
+                "request_memory" : 2000,
                 #"+MaxRuntime" : "{60*60*8}",
                 "on_exit_remove" : "((ExitBySignal == False) && (ExitCode == 0)) || (NumJobStarts >= 2)",
                 }
@@ -120,13 +120,20 @@ def setup_dirs(datasets, tag):
             
 
 def main():
-    tag = 'Jan11'
-    #with open("input/fileset_2017.json","r") as f:
-    #    datasets_2017 = json.loads(f.read())
-    datasets_2017 = []
+    tag = 'Mar01'
+    skiplist = []
+    whitelist = ['ST','WJets','ZJets']
+    with open("input/fileset_2017.json","r") as f:
+        datasets_2017 = json.loads(f.read())
     with open("input/fileset_2018.json","r") as f:
         datasets_2018 = json.loads(f.read())
-    datasets = datasets_2017 + datasets_2018
+    datasets = []
+    for d in datasets_2017 + datasets_2018:
+        if any(d['dataset'].startswith(s) for s in skiplist): continue
+        if len(whitelist)>0:
+            if (not any(w in d['dataset'] for w in whitelist)): continue
+        print(d['dataset'])
+        datasets.append(d)
 
     setup_dirs(datasets, tag)
 

@@ -7,11 +7,14 @@ eosdir = "/store/group/lpcbacon/pancakes/02/"
 
 dirlist = [
     #["2017/UL/", "2017",["hadd","MET","DYJets","GluGlu","Electron","WJetsToLNu","WW","WZ","ZZ","JetHT/pancakes-02_Run2017B", "QCD_HT100to200", "QCD_HT200to300","QCD_HT50to100","SingleMuon","JetHT","SingleElectron","Tau"],{"SingleMuon":"withPF",},],
-    ["2017/UL/", "2017",["hadd","MET","DYJets","GluGlu","Electron","WJetsToLNu","WW","WZ","ZZ","JetHT/pancakes-02_Run2017B", "QCD_HT100to200", "QCD_HT200to300","QCD_HT50to100","SingleMuon","JetHT","SingleElectron","Tau"],{"SingleMuon":"withPF",},],
+    ["2017/UL/", "2017",["hadd","MET","DYJets","GluGlu","Electron","WJetsToLNu","WW","WZ","ZZ","JetHT/pancakes-02_Run2017B", "QCD_HT100to200", "QCD_HT200to300","QCD_HT50to100","SingleMuon","JetHT","SingleElectron","Tau"],{"SingleMuon":"withPF","SingleElectron":"withPF"},],
+    ["2017/", "2017", ["UL","tmp","JetHT","Single","ZPrime","BulkGrav"],{"GluGluHToTauTau":"TauTau","VBFHToTauTau":"TauTau","WminusHToTauTau":"TauTau","WplusHToTauTau":"TauTau","ZHToTauTau":"TauTau","ggZH_HToTauTau_ZToLL":"TauTau","ggZH_HToTauTau_ZToNuNu":"TauTau","ggZH_HToTauTau_ZToQQ":"TauTau","ttHToTauTau":"TauTau"}],
     ["2017/tmp-VJets-withPF", "2017",["UL"], {},],#["tmp-VJets-withPF"]],
     ["2017/tmp-VJets-withPF/UL", "2017",[], {},],#["tmp-VJets-withPF"]],
     ["2017/tmp-WJets-withPF", "2017",[], {},],#["tmp-VJets-withPF"]],
     ["2017/UL/SingleMuon","2017",[],{"SingleMuon":"withPF"}],
+    ["2017/UL/SingleElectron","2017",[],{"SingleElectron":"withPF"}],
+    ["2017/UL/MET","2017",[],{"MET":"withPF"}],
     ["2017/UL/JetHT","2017",[],{}], 
     #["2017/UL/Tau","2017",[],{}], 
     #["2017/UL/SingleElectron","2017",[],{}], 
@@ -56,6 +59,7 @@ for dirs in dirlist:
         if 'JetHT' in curdir: name = 'JetHT_' + name
         if 'Tau' in curdir and 'TauTau' not in curdir: name = 'Tau_' + name
         if 'SingleElectron' in curdir: name = 'SingleElectron_' + name
+        if 'MET' in curdir: name = 'MET_' + name
         
 
         requirements = ""

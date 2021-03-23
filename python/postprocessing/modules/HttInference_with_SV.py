@@ -6,6 +6,7 @@ from array import array
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from keras.models import load_model
+import json
 import os
 import tensorflow as tf
 
@@ -83,6 +84,48 @@ class inferencerClass(Module):
         self.model6p1_hadel = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/deepDoubleTau_hadel_v6.1.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
         self.model6p1_hadmu = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/deepDoubleTau_hadmu_v6.1.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
 
+        #print(self.model4p1_hadhad.summary())
+        #print(self.model6p1_hadel.summary())
+        #print(self.model6p1_hadmu.summary())
+
+#        json_file_hadhad = open(base+ '/src/PhysicsTools/NanoAODTools/data/fullmodel_hadhad_regression_v0.json', 'r')
+#        model_json_hadhad = json_file_hadhad.read()
+#        self.massreg_hadhad = model_from_json(model_json_hadhad)
+#        self.massreg_hadhad.load_weights(base+ '/src/PhysicsTools/NanoAODTools/data/fullmodel_hadhad_regression_v0_weights.h5')
+#
+#        json_file_hadel = open(base+ '/src/PhysicsTools/NanoAODTools/data/fullmodel_hadel_regression_v0.json', 'r')
+#        model_json_hadel = json_file_hadel.read()
+#        self.massreg_hadel = model_from_json(model_json_hadel)
+#        self.massreg_hadel.load_weights(base+ '/src/PhysicsTools/NanoAODTools/data/fullmodel_hadel_regression_v0_weights.h5')
+#
+#        json_file_hadmu = open(base+ '/src/PhysicsTools/NanoAODTools/data/fullmodel_hadmu_regression_v0.json', 'r')
+#        model_json_hadmu = json_file_hadmu.read()
+#        self.massreg_hadmu = model_from_json(model_json_hadmu)
+#        self.massreg_hadmu.load_weights(base+ '/src/PhysicsTools/NanoAODTools/data/fullmodel_hadmu_regression_v0_weights.h5')
+
+        self.massreg_hadhad = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/fullmodel_hadhad_regression_v0.h5')
+        self.massreg_hadel = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/fullmodel_hadel_regression_v0.h5')
+        self.massreg_hadmu = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/fullmodel_hadmu_regression_v0.h5')
+
+        #self.massreg_hadhad = load_model(base+ '/src/TrainMassReg/models/fullmodel_hadhad_regression_001_norm_mae_add13k.h5',custom_objects={'tf':tf})
+        #self.massreg_hadel = load_model(base+ '/src/TrainMassReg/models/fullmodel_hadel_regression_v0.h5',custom_objects={'tf':tf})
+        #self.massreg_hadmu = load_model(base+ '/src/TrainMassReg/models/fullmodel_hadmu_regression_v0.h5',custom_objects={'tf':tf})
+
+        #print('HADHAD')
+        #print(self.massreg_hadhad.summary())
+        #print(self.massreg_hadhad.get_weights())
+        #print('HADEL')
+        #print(self.massreg_hadel.summary())
+        #print(self.massreg_hadel.get_weights())
+        #print('HADMU')
+        #print(self.massreg_hadmu.summary())
+        #print(self.massreg_hadmu.get_weights())
+
+        self.log_pf = []
+        self.log_sv = []
+        self.log_evt = []
+        self.log_mreg = []
+
     def beginJob(self):
         pass
 
@@ -96,6 +139,10 @@ class inferencerClass(Module):
         self.out.branch("GRU_hadel_v6p1", "F", 1)
         self.out.branch("GRU_hadmu_v6p1", "F", 1)
 
+        self.out.branch("MassReg_hadhad", "F", 1)
+        self.out.branch("MassReg_hadel", "F", 1)
+        self.out.branch("MassReg_hadmu", "F", 1)
+
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
 
@@ -105,10 +152,15 @@ class inferencerClass(Module):
         jets = Collection(event, "FatJet")
         svs = Collection(event, "SV")
         met = Object(event, "MET")
+        pupmet = Object(event, "PuppiMET")
 
         IN_hadhad_v4p1 = np.full(1, -1., dtype=np.float32)
         GRU_hadel_v6p1 = np.full(1, -1., dtype=np.float32)
         GRU_hadmu_v6p1 = np.full(1, -1., dtype=np.float32)
+
+        MassReg_hadhad = np.full(1, -1., dtype=np.float32)
+        MassReg_hadel = np.full(1, -1., dtype=np.float32)
+        MassReg_hadmu = np.full(1, -1., dtype=np.float32)
 
         jet_idx = 0
         min_dphi = 999.
@@ -248,15 +300,52 @@ class inferencerClass(Module):
             svData = np.vstack([svdlen,svdlenSig, svdxy, svdxySig, svchi2, svpAngle, svx, svy, svz, svpt, svmass, sveta, svphi])
             svData = np.transpose(svData)
             svData = np.expand_dims(svData, axis=0)
+            #["MET_covXX","MET_covXY","MET_covYY","MET_phi","MET_pt","MET_significance","PuppiMET_pt","PuppiMET_phi","fj_eta","fj_phi","fj_msd","fj_pt"]
+            #evtData = np.array([met.covXX,met.covXY,met.covYY,met.phi,met.pt,met.significance,pupmet.pt,pupmet.phi,jeta,jphi,jmsd,jpt])
+            evtData = np.array([met.covXX,met.covXY,met.covYY,signedDeltaPhi(met.phi,jphi),met.pt,met.significance,pupmet.pt,signedDeltaPhi(pupmet.phi,jphi),jeta,jphi,jmsd,jpt])
+            evtData = np.expand_dims(evtData,axis=0)
 
             IN_hadhad_v4p1[0] = float(self.model4p1_hadhad.predict([pfData, svData]))
             GRU_hadel_v6p1[0] = float(self.model6p1_hadel.predict([pfData, svData]))
             GRU_hadmu_v6p1[0] = float(self.model6p1_hadmu.predict([pfData, svData]))
+
+            idconv = {211.:1, 13.:2,  22.:3,  11.:4, 130.:5, 1.:6, 2.:7, 3.:8, 4.:9,
+                5.:10, -211.:1, -13.:2,
+                -11.:4, -1.:-6, -2.:7, -3.:8, -4.:9, -5.:10, 0.:0}
+            nIDs = 33
+            pfData[:,:,-1] = np.vectorize(idconv.__getitem__)(pfData[:,:,-1])
+
+            MassReg_hadhad[0] = float(self.massreg_hadhad.predict([pfData, svData, evtData]))
+            MassReg_hadel[0]  = float(self.massreg_hadel.predict([pfData, svData, evtData]))
+            MassReg_hadmu[0]  = float(self.massreg_hadmu.predict([pfData, svData, evtData]))
+
+            #self.log_pf.append(pfData)
+            #self.log_sv.append(svData)
+            #self.log_evt.append(evtData)
+            #self.log_mreg.append(np.array([MassReg_hadhad[0], MassReg_hadel[0], MassReg_hadmu[0]]))
+
+            #with open('test.npy', 'wb') as f:
+            #    np.save(f, np.vstack(self.log_pf))
+            #    np.save(f, np.vstack(self.log_sv))
+            #    np.save(f, np.vstack(self.log_evt))
+            #    np.save(f, np.vstack(self.log_mreg))
+                #np.save(f, pfData)
+                #np.save(f, svData)
+                #np.save(f, evtData)
+                #np.save(f, np.array([MassReg_hadhad[0], MassReg_hadel[0], MassReg_hadmu[0]]))
+                #np.save(f, self.massreg_hadhad.get_weights())
+                #np.save(f, self.massreg_hadel.get_weights())
+                #np.save(f, self.massreg_hadmu.get_weights())
+
             # assert abs( 1 - float(self.model.predict(X)[0,1]) - float(self.model.predict(X)[0,0])) < 0.02
             # print(X,IN_hadhad_v4p1[0], GRU_hadel_v6p1[0])
         self.out.fillBranch("IN_hadhad_v4p1", IN_hadhad_v4p1)
         self.out.fillBranch("GRU_hadel_v6p1", GRU_hadel_v6p1)
         self.out.fillBranch("GRU_hadmu_v6p1", GRU_hadmu_v6p1)
+
+        self.out.fillBranch("MassReg_hadhad", MassReg_hadhad)
+        self.out.fillBranch("MassReg_hadel", MassReg_hadel)
+        self.out.fillBranch("MassReg_hadmu", MassReg_hadmu)
         return True
 
 

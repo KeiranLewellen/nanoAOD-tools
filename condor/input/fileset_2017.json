@@ -18,7 +18,7 @@
 	},
 	{"dataset" : "QCD_HT500to700_TuneCP5_PSWeights_13TeV-madgraphMLM-pythia8",
 	"filelist" : "input/2017/QCD_HT500to700_TuneCP5_PSWeights_13TeV-madgraphMLM-pythia8.txt",
-	"mergefactor" : 20
+	"mergefactor" : 3
 	},
 	{"dataset" : "QCD_HT700to1000_TuneCP5_PSWeights_13TeV-madgraphMLM-pythia8",
 	"filelist" : "input/2017/QCD_HT700to1000_TuneCP5_PSWeights_13TeV-madgraphMLM-pythia8.txt",
@@ -38,19 +38,19 @@
 	},
 	{"dataset" : "ST_s-channel_4f_hadronicDecays_TuneCP5_13TeV-amcatnlo-pythia8",
 	"filelist" : "input/2017/ST_s-channel_4f_hadronicDecays_TuneCP5_13TeV-amcatnlo-pythia8.txt",
-	"mergefactor" : 20
+	"mergefactor" : 10
 	},
 	{"dataset" : "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8",
 	"filelist" : "input/2017/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8.txt",
-	"mergefactor" : 20
+	"mergefactor" : 10
 	},
 	{"dataset" : "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8",
 	"filelist" : "input/2017/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8.txt",
-	"mergefactor" : 20
+	"mergefactor" : 10
 	},
 	{"dataset" : "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8",
 	"filelist" : "input/2017/ST_t-channel_top_4f_InclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8.txt",
-	"mergefactor" : 5
+	"mergefactor" : 10
 	},
 	{"dataset" : "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8",
 	"filelist" : "input/2017/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8.txt",
@@ -152,24 +152,100 @@
 	"filelist" : "input/2017/SingleMuon_pancakes-02-withPF_Run2017F-09Aug2019_UL2017-v1.txt",
 	"mergefactor" : 3
 	},
+	{"dataset" : "SingleElectron_pancakes-02-withPF_Run2017B-09Aug2019_UL2017-v1",
+	"filelist" : "input/2017/SingleElectron_pancakes-02-withPF_Run2017B-09Aug2019_UL2017-v1.txt",
+	"mergefactor" : 5
+	},
+	{"dataset" : "SingleElectron_pancakes-02-withPF_Run2017C-09Aug2019_UL2017-v1",
+	"filelist" : "input/2017/SingleElectron_pancakes-02-withPF_Run2017C-09Aug2019_UL2017-v1.txt",
+	"mergefactor" : 5
+	},
+	{"dataset" : "SingleElectron_pancakes-02-withPF_Run2017D-09Aug2019_UL2017-v1",
+	"filelist" : "input/2017/SingleElectron_pancakes-02-withPF_Run2017D-09Aug2019_UL2017-v1.txt",
+	"mergefactor" : 5
+	},
+	{"dataset" : "SingleElectron_pancakes-02-withPF_Run2017E-09Aug2019_UL2017-v1",
+	"filelist" : "input/2017/SingleElectron_pancakes-02-withPF_Run2017E-09Aug2019_UL2017-v1.txt",
+	"mergefactor" : 5
+	},
+	{"dataset" : "SingleElectron_pancakes-02-withPF_Run2017F-09Aug2019_UL2017_rsb-v2",
+	"filelist" : "input/2017/SingleElectron_pancakes-02-withPF_Run2017F-09Aug2019_UL2017_rsb-v2.txt",
+	"mergefactor" : 5
+	},
 	{"dataset" : "JetHT_pancakes-02_Run2017B-09Aug2019_UL2017-v1",
 	"filelist" : "input/2017/JetHT_pancakes-02_Run2017B-09Aug2019_UL2017-v1.txt",
-	"mergefactor" : 10
+	"mergefactor" : 5
 	},
 	{"dataset" : "JetHT_pancakes-02_Run2017C-09Aug2019_UL2017-v1",
 	"filelist" : "input/2017/JetHT_pancakes-02_Run2017C-09Aug2019_UL2017-v1.txt",
-	"mergefactor" : 10
+	"mergefactor" : 5
 	},
 	{"dataset" : "JetHT_pancakes-02_Run2017D-09Aug2019_UL2017-v1",
 	"filelist" : "input/2017/JetHT_pancakes-02_Run2017D-09Aug2019_UL2017-v1.txt",
-	"mergefactor" : 10
+	"mergefactor" : 5
 	},
 	{"dataset" : "JetHT_pancakes-02_Run2017E-09Aug2019_UL2017-v1",
 	"filelist" : "input/2017/JetHT_pancakes-02_Run2017E-09Aug2019_UL2017-v1.txt",
-	"mergefactor" : 10
+	"mergefactor" : 5
 	},
 	{"dataset" : "JetHT_pancakes-02_Run2017F-09Aug2019_UL2017-v1",
 	"filelist" : "input/2017/JetHT_pancakes-02_Run2017F-09Aug2019_UL2017-v1.txt",
-	"mergefactor" : 10
+	"mergefactor" : 5
+	},
+	{"dataset" : "VBFHToTauTau_M125_13TeV_powheg_pythia8",
+	"filelist" : "input/2017/VBFHToTauTau_M125_13TeV_powheg_pythia8.txt",
+	"mergefactor" : 5
+	},
+	{"dataset" : "GluGluHToTauTau_M125_13TeV_powheg_pythia8",
+	"filelist" : "input/2017/GluGluHToTauTau_M125_13TeV_powheg_pythia8.txt",
+	"mergefactor" : 5
+	},
+	{"dataset" : "WminusHToTauTau_M125_13TeV_powheg_pythia8",
+	"filelist" : "input/2017/WminusHToTauTau_M125_13TeV_powheg_pythia8.txt",
+	"mergefactor" : 5
+	},
+	{"dataset" : "WplusHToTauTau_M125_13TeV_powheg_pythia8",
+	"filelist" : "input/2017/WplusHToTauTau_M125_13TeV_powheg_pythia8.txt",
+	"mergefactor" : 5
+	},
+	{"dataset" : "ZHToTauTau_M125_13TeV_powheg_pythia8",
+	"filelist" : "input/2017/ZHToTauTau_M125_13TeV_powheg_pythia8.txt",
+	"mergefactor" : 5
+	},
+	{"dataset" : "ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8",
+	"filelist" : "input/2017/ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8.txt",
+	"mergefactor" : 5
+	},
+	{"dataset" : "ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8",
+	"filelist" : "input/2017/ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8.txt",
+	"mergefactor" : 5
+	},
+	{"dataset" : "ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8",
+	"filelist" : "input/2017/ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8.txt",
+	"mergefactor" : 5
+	},
+	{"dataset" : "ttHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8",
+	"filelist" : "input/2017/ttHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8.txt",
+	"mergefactor" : 5
+	},
+	{"dataset" : "MET_pancakes-02-withPF_Run2017B-09Aug2019_UL2017_rsb-v1",
+	"filelist" : "input/2017/MET_pancakes-02-withPF_Run2017B-09Aug2019_UL2017_rsb-v1.txt",
+	"mergefactor" : 5
+	},
+	{"dataset" : "MET_pancakes-02-withPF_Run2017C-09Aug2019_UL2017_rsb-v1",
+	"filelist" : "input/2017/MET_pancakes-02-withPF_Run2017C-09Aug2019_UL2017_rsb-v1.txt",
+	"mergefactor" : 5
+	},
+	{"dataset" : "MET_pancakes-02-withPF_Run2017D-09Aug2019_UL2017_rsb-v1",
+	"filelist" : "input/2017/MET_pancakes-02-withPF_Run2017D-09Aug2019_UL2017_rsb-v1.txt",
+	"mergefactor" : 5
+	},
+	{"dataset" : "MET_pancakes-02-withPF_Run2017E-09Aug2019_UL2017_rsb-v1",
+	"filelist" : "input/2017/MET_pancakes-02-withPF_Run2017E-09Aug2019_UL2017_rsb-v1.txt",
+	"mergefactor" : 5
+	},
+	{"dataset" : "MET_pancakes-02-withPF_Run2017F-09Aug2019_UL2017_rsb-v1",
+	"filelist" : "input/2017/MET_pancakes-02-withPF_Run2017F-09Aug2019_UL2017_rsb-v1.txt",
+	"mergefactor" : 5
 	}
 ]
