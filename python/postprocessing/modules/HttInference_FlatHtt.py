@@ -212,7 +212,11 @@ class inferencerClass(Module):
 
                     ##find candidates associated to jet
             candrange = range(pf_idx, pf_idx + jet.nPFConstituents)
-
+            
+            idconv = {211.: 1, 13.: 2, 22.: 3, 11.: 4, 130.: 5, 1.: 6, 2.: 7, 3.: 8, 4.: 9,
+              5.: 10, -211.: 1, -13.: 2,
+              -11.: 4, -1.: -6, -2.: 7, -3.: 8, -4.: 9, -5.: 10, 0.: 0}
+            
             ##Fill PF candidates
             pfpt = np.zeros(self.Nparts, dtype=np.float16)
             pfeta = np.zeros(self.Nparts, dtype=np.float16)
@@ -235,7 +239,7 @@ class inferencerClass(Module):
                 pfpup[arrIdx] = part.puppiWeight
                 pfpupnolep[arrIdx] = part.puppiWeightNoLep
                 pfq[arrIdx] = part.charge
-                pfid[arrIdx] = part.pdgId
+                pfid[arrIdx] = idconv[part.pdgId]
                 pfdz[arrIdx] = part.dz
                 pfdxy[arrIdx] = part.d0
                 pfdxyerr[arrIdx] = part.d0Err
