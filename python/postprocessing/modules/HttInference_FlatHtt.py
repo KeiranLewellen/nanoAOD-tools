@@ -81,7 +81,8 @@ class inferencerClass(Module):
         self.model4p1_hadhad = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/IN_hadhad_v4p1,on_QCD,fillFactor=2,take_2,model.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
         self.model6p1_hadel = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/GRU_hadel_v6p1,on_TTbar_WJets,fillFactor=1_5,take_3,model.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
         self.model6p1_hadmu = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/GRU_hadmu_v6p1,on_TTbar_WJets,fillFactor=1_5,take_3,model.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
-
+        self.model6p1_ZDecays = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/GRU_ZDecays_v6p1,take_1,model.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})        
+    
     def beginJob(self):
         pass
 
@@ -94,6 +95,7 @@ class inferencerClass(Module):
         self.out.branch("IN_flat_hadhad_v4p1", "F", 1)
         self.out.branch("GRU_flat_hadel_v6p1", "F", 1)
         self.out.branch("GRU_flat_hadmu_v6p1", "F", 1)
+        self.out.branch("GRU_ZDecays_v6p1", "F", 1)
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -108,6 +110,7 @@ class inferencerClass(Module):
         IN_hadhad_v4p1 = np.full(1, -1., dtype=np.float32)
         GRU_hadel_v6p1 = np.full(1, -1., dtype=np.float32)
         GRU_hadmu_v6p1 = np.full(1, -1., dtype=np.float32)
+        GRU_ZDecays_v6p1 = np.full(1, -1., dtype=np.float32)
 
         jet_idx = 0
         min_dphi = 999.
@@ -209,7 +212,11 @@ class inferencerClass(Module):
 
                     ##find candidates associated to jet
             candrange = range(pf_idx, pf_idx + jet.nPFConstituents)
-
+            
+            idconv = {211.: 1, 13.: 2, 22.: 3, 11.: 4, 130.: 5, 1.: 6, 2.: 7, 3.: 8, 4.: 9,
+              5.: 10, -211.: 1, -13.: 2,
+              -11.: 4, -1.: -6, -2.: 7, -3.: 8, -4.: 9, -5.: 10, 0.: 0}
+            
             ##Fill PF candidates
             pfpt = np.zeros(self.Nparts, dtype=np.float16)
             pfeta = np.zeros(self.Nparts, dtype=np.float16)
@@ -232,7 +239,7 @@ class inferencerClass(Module):
                 pfpup[arrIdx] = part.puppiWeight
                 pfpupnolep[arrIdx] = part.puppiWeightNoLep
                 pfq[arrIdx] = part.charge
-                pfid[arrIdx] = part.pdgId
+                pfid[arrIdx] = idconv[part.pdgId]
                 pfdz[arrIdx] = part.dz
                 pfdxy[arrIdx] = part.d0
                 pfdxyerr[arrIdx] = part.d0Err
@@ -256,6 +263,7 @@ class inferencerClass(Module):
         self.out.fillBranch("IN_flat_hadhad_v4p1", IN_hadhad_v4p1)
         self.out.fillBranch("GRU_flat_hadel_v6p1", GRU_hadel_v6p1)
         self.out.fillBranch("GRU_flat_hadmu_v6p1", GRU_hadmu_v6p1)
+        self.out.fillBranch("GRU_ZDecays_v6p1", GRU_ZDecays_v6p1)
         return True
 
 
