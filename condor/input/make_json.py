@@ -1,17 +1,100 @@
 import json, glob
 
-year = '2017'
+year = '2017_preUL'
 
-mergefactors = { "JetHT_pancakes-02_Run2017B-09Aug2019_UL2017-v1" : 10,
+mergefactors_2016 = {	"JetHT" : 10,
+			"TT_TuneCUETP8M2T4_13TeV-powheg-pythia8" : 10,
+ 			"QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 3,
+ 			"QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 3,
+ 			"QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 2,
+ 			"QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 2,
+ 			"QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 2,
+			"SingleMuon" : 5,
+			"TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8" : 5,
+			"TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8" : 5,
+			"TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8" : 10,
+			"WJetsToQQ_HT-800toInf_qc19_3j_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 4,
+			"WJetsToQQ_HT600to800_qc19_3j_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 6,
+			"WJetsToQQ_HT400to600_qc19_3j_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 15,
+			"ZJetsToQQ_HT-800toInf_qc19_4j_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 4,
+			"ZJetsToQQ_HT600to800_qc19_4j_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 6,
+			"ZJetsToQQ_HT400to600_qc19_4j_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 15,
+                        "VectorZPrimeGammaToQQGamma_flat_13TeV_madgraph_pythia8_TuneCUETP8M1" : 10,
+
+			"WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 50,
+			"WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 50,
+			"WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 20,
+			"WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 20,
+			"WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 10,
+			"WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 10,
+			"WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 5,
+			"WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 5,
+			"DYJetsToLL_M-50_HT-70to100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 50,
+			"DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 50,
+			"DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 20,
+			"DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 20,
+			"DYJetsToLL_M-50_HT-600to800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 10,
+			"DYJetsToLL_M-50_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 10,
+			"DYJetsToLL_M-50_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 5,
+			"DYJetsToLL_M-50_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : 5,
+			"ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1" : 10,
+			"ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1" : 10,
+			"ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1" : 10,
+			"ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1" : 10,
+			}
+mergefactors_2017_preUL = { 
+                 "JetHT_pancakes-02_Run2017B-31Mar2018-v1" : 10,
+                 "JetHT_pancakes-02_Run2017C-31Mar2018-v1" : 10,
+                 "JetHT_pancakes-02_Run2017D-31Mar2018-v1" : 10,
+                 "JetHT_pancakes-02_Run2017E-31Mar2018-v1" : 10,
+                 "JetHT_pancakes-02_Run2017F-31Mar2018-v1" : 10,
+                 "SingleMuon_pancakes-02_Run2017B-31Mar2018-v1" : 3,
+                 "SingleMuon_pancakes-02_Run2017C-31Mar2018-v1" : 3,
+                 "SingleMuon_pancakes-02_Run2017D-31Mar2018-v1" : 3,
+                 "SingleMuon_pancakes-02_Run2017E-31Mar2018-v1" : 3,
+                 "SingleMuon_pancakes-02_Run2017F-31Mar2018-v1" : 3,
+                 "QCD_HT500to700_TuneCP5_13TeV-madgraph-pythia8" : 20,
+                 "QCD_HT700to1000_TuneCP5_13TeV-madgraph-pythia8" : 3,
+                 "QCD_HT1000to1500_TuneCP5_13TeV-madgraph-pythia8" : 2,
+                 "QCD_HT1500to2000_TuneCP5_13TeV-madgraph-pythia8" : 1,
+                 "QCD_HT2000toInf_TuneCP5_13TeV-madgraph-pythia8" : 2,
+                 "ZJetsToQQ_HT400to600_qc19_4j_TuneCP5_13TeV-madgraphMLM-pythia8" : 8, 
+                 "ZJetsToQQ_HT600to800_qc19_4j_TuneCP5_13TeV-madgraphMLM-pythia8" : 8, 
+                 "ZJetsToQQ_HT-800toInf_qc19_4j_TuneCP5_13TeV-madgraphMLM-pythia8" : 8,
+                 "WJetsToQQ_HT400to600_qc19_3j_TuneCP5_13TeV-madgraphMLM-pythia8" : 8, 
+                 "WJetsToQQ_HT600to800_qc19_3j_TuneCP5_13TeV-madgraphMLM-pythia8" : 8, 
+                 "WJetsToQQ_HT-800toInf_qc19_3j_TuneCP5_13TeV-madgraphMLM-pythia8" : 8, 
+                 "TTToHadronic_TuneCP5_13TeV-powheg-pythia8" : 5,
+                 "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8" : 5, 
+                 "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8" : 20,
+                 "ST_s-channel_4f_hadronicDecays_TuneCP5_13TeV-amcatnlo-pythia8" : 20,
+                 "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8" : 20,
+                 "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8" : 20,
+                 "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8" : 5,
+                 "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8" : 5,
+                 "ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8" : 5,
+		 "VectorZPrimeGammaToQQGamma_flat_13TeV_madgraph_pythia8_TuneCP5" : 5,}
+
+mergefactors_2017 = { "JetHT_psncakes-02_Run2017B-09Aug2019_UL2017-v1" : 10,
                  "JetHT_pancakes-02_Run2017C-09Aug2019_UL2017-v1" : 10,
                  "JetHT_pancakes-02_Run2017D-09Aug2019_UL2017-v1" : 10,
                  "JetHT_pancakes-02_Run2017E-09Aug2019_UL2017-v1" : 10,
                  "JetHT_pancakes-02_Run2017F-09Aug2019_UL2017-v1" : 10,
+                 "JetHT_pancakes-02_Run2017B-31Mar2018-v1" : 10,
+                 "JetHT_pancakes-02_Run2017C-31Mar2018-v1" : 10,
+                 "JetHT_pancakes-02_Run2017D-31Mar2018-v1" : 10,
+                 "JetHT_pancakes-02_Run2017E-31Mar2018-v1" : 10,
+                 "JetHT_pancakes-02_Run2017F-31Mar2018-v1" : 10,
                  "SingleMuon_pancakes-02-withPF_Run2017B-09Aug2019_UL2017-v1" : 3,
                  "SingleMuon_pancakes-02-withPF_Run2017C-09Aug2019_UL2017-v1" : 3,
                  "SingleMuon_pancakes-02-withPF_Run2017D-09Aug2019_UL2017-v1" : 3,
                  "SingleMuon_pancakes-02-withPF_Run2017E-09Aug2019_UL2017-v1" : 3,
                  "SingleMuon_pancakes-02-withPF_Run2017F-09Aug2019_UL2017-v1" : 3,
+                 "SingleMuon_pancakes-02_Run2017B-31Mar2018-v1" : 3,
+                 "SingleMuon_pancakes-02_Run2017C-31Mar2018-v1" : 3,
+                 "SingleMuon_pancakes-02_Run2017D-31Mar2018-v1" : 3,
+                 "SingleMuon_pancakes-02_Run2017E-31Mar2018-v1" : 3,
+                 "SingleMuon_pancakes-02_Run2017F-31Mar2018-v1" : 3,
                  "QCD_HT300to500_TuneCP5_PSWeights_13TeV-madgraphMLM-pythia8" : 20,
                  "QCD_HT500to700_TuneCP5_PSWeights_13TeV-madgraphMLM-pythia8" : 20,
                  "QCD_HT700to1000_TuneCP5_PSWeights_13TeV-madgraphMLM-pythia8" : 3,
@@ -52,6 +135,11 @@ for i, s in enumerate(glob.glob(year+'/*')):
     of.write('"dataset" : "%s",\n'%s.replace('.txt','').replace(year+'/',''))
     of.write('\t"filelist" : "input/%s",\n'%s)
 
-    of.write('\t"mergefactor" : %i\n\t},'%mergefactors[s.replace('.txt','').replace(year+'/','')])
+    if '2016' in year:         of.write('\t"mergefactor" : %i\n\t}'%mergefactors_2016[s.replace('.txt','').replace(year+'/','')])
+    elif year == '2017':       of.write('\t"mergefactor" : %i\n\t}'%mergefactors_2017[s.replace('.txt','').replace(year+'/','')])
+    elif year == '2017_preUL': of.write('\t"mergefactor" : %i\n\t}'%mergefactors_2017_preUL[s.replace('.txt','').replace(year+'/','')])
+    elif '2018' in year:       of.write('\t"mergefactor" : %i\n\t}'%mergefactors_2018[s.replace('.txt','').replace(year+'/','')])
+    if i != len(glob.glob(year+'/*')) -1: of.write(',')
 of.write('\n]')
 of.close()
+

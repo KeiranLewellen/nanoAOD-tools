@@ -7,6 +7,7 @@ DATASET=${!i}; i=$((i+1))
 SHORT=${!i}; i=$((i+1))
 YEAR=${!i}; i=$((i+1))
 ISMC=${!i}; i=$((i+1))
+ISINFER=${!i}; i=$((i+1))
 ICHUNK=${!i}; i=$((i+1))
 SUBDATE=${!i};i=$((i+1))
 CONVERT=${!i};i=$((i+1))
@@ -86,15 +87,32 @@ echo ''
 echo '--- Starting skim'
 echo "${FILES[@]}"
 echo "${CUT}"
+postfix="_post-process"
+IFS=" "
+splitfiles=($FILES)
+unset IFS
 
-echo "start python $(date)"
-python scripts/nano_postproc.py tmp/ ${FILES[@]} -I PhysicsTools.NanoAODTools.postprocessing.modules.ZprInference inferencer -c "${CUT}" -s "${DATASET}"
-echo "done python $(date)"
-#OUTDIR="/store/user/jkrupa/nanopost_process/${TAG}" 
-#/$(echo $DATASET | sed "s|/| |g" | awk '{print $1}')/${SHORT}/${SUBDATE}/1337/"
-#eos  root://cmseos.fnal.gov/ mkdir -p ${OUTDIR}
+for f in "${splitfiles[@]}"
+do
+  IFS="/"
+  split=($f) #$(echo $x | tr "/" " ")  
+  unset IFS
+  postfix="_post-process_${split[-4]}"
+  echo "start python $(date)"
+  #if [[ ${ISINFER} ]]
+  #then 
+  #  python scripts/nano_postproc.py tmp/ $f -I PhysicsTools.NanoAODTools.postprocessing.modules.ZprInference inferencer -c "${CUT}" -s "${postfix}" --bo scripts/keep_and_drop.txt
+  #else
+    python scripts/nano_postproc.py tmp/ $f -I PhysicsTools.NanoAODTools.postprocessing.modules.ZprTraining pfModule -c "${CUT}" -s "${postfix}" --bo scripts/keep_and_drop_training.txt
+  #fi
+
+  echo "done python $(date)"
+done
+
+
 echo "start copying $(date)"
-for i in tmp/*; do xrdcp -f $i root://cmseos.fnal.gov/${OUTDIR}/; done
-#xrdcp -pf tmp/* root://cmseos.fnal.gov/${OUTDIR}/ #tree_${ICHUNK}.root
+for i in tmp/*; do python scripts/haddnano.py ${i/.root/_hadd.root} ${i}; done
+for i in tmp/*_hadd.root; do xrdcp -f $i root://cmseos.fnal.gov/${OUTDIR}/; done
 echo "done copying $(date)"
+
 rm -rf tmp/*
