@@ -5,6 +5,7 @@ from array import array
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection 
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from keras.models import load_model
+import onnxruntime as rt
 import os
 import tensorflow as tf
 class inferencerClass(Module):
@@ -16,6 +17,8 @@ class inferencerClass(Module):
         self.model_GRU = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/weights_gru.h5')
         #self.model_GRU = load_model('/uscms/home/jkrupa/nobackup/subjetNN/CMSSW_10_2_11/src/PandaAnalysis/dazsle-tagger/evt/nanofiles/deepJet-v8/v25/weights_gru.h5')
         self.model_IN  = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/weights_IN_v101.h5', custom_objects={'tf': tf})
+      
+
     def beginJob(self):
         pass
     def endJob(self):
