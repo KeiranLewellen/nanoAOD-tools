@@ -166,6 +166,7 @@ class PostProcessor:
                            self.firstEntry, self.maxEntries)
             totEntriesRead += nEntries
             # pre-skimming
+            print("preskimming",inTree, self.json, self.cut, self.maxEntries, self.firstEntry)
             elist, jsonFilter = preSkim(
                 inTree, self.json, self.cut, maxEntries=self.maxEntries, firstEntry=self.firstEntry)
             if self.justcount:
@@ -186,6 +187,7 @@ class PostProcessor:
                 inAddTrees.append(inAddTree)
                 inTree.AddFriend(inAddTree)
 
+            print('tree/list',inTree, elist)
             if fullClone:
                 # no need of a reader (no event loop), but set up the elist if available
                 if elist:

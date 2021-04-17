@@ -76,6 +76,7 @@ if __name__ == "__main__":
     if options.branchsel != None:
         options.branchsel_in = options.branchsel
         options.branchsel_out = options.branchsel
+    print(modules)
     p = PostProcessor(outdir, args,
                       cut=options.cut,
                       branchsel=options.branchsel_in,
