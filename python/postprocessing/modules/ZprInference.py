@@ -86,7 +86,10 @@ class inferencerClass(Module):
             X = np.reshape(X,(X.shape[0],self.Nparts)).T
             X = np.reshape(X,(1,X.shape[0],X.shape[1]))
             X = X.astype(np.float32)
-            tagger_IN_14Apr21_2016_v1[ij] = self.model_14Apr21_2016_v1["session"].run([self.model_14Apr21_2016_v1["output_name"]], {self.model_14Apr21_2016_v1["input_name"] : X })[0][0][1]
+
+            inputname = self.model_14Apr21_2016_v1["input_name"]
+            outputname = self.model_14Apr21_2016_v1["output_name"]
+            tagger_IN_14Apr21_2016_v1[ij] = self.model_14Apr21_2016_v1["session"].run([outputname], {inputname : X })[0][0][1]
 
         self.out.fillBranch("IN_14Apr21_2016_v1",tagger_IN_14Apr21_2016_v1)
         return True
