@@ -247,5 +247,33 @@
 	{"dataset" : "MET_pancakes-02-withPF_Run2017F-09Aug2019_UL2017_rsb-v1",
 	"filelist" : "input/2017/MET_pancakes-02-withPF_Run2017F-09Aug2019_UL2017_rsb-v1.txt",
 	"mergefactor" : 5
+	},
+	{"dataset" : "JetHT_pancakes-02_Run2017B-31Mar2018-v1",
+	"filelist" : "input/2017/JetHT_pancakes-02_Run2017B-31Mar2018-v1.txt",
+	"mergefactor" : 10
+	},
+	{"dataset" : "JetHT_pancakes-02_Run2017C-31Mar2018-v1",
+	"filelist" : "input/2017/JetHT_pancakes-02_Run2017C-31Mar2018-v1.txt",
+	"mergefactor" : 10
+	},
+	{"dataset" : "JetHT_pancakes-02_Run2017E-31Mar2018-v1",
+	"filelist" : "input/2017/JetHT_pancakes-02_Run2017E-31Mar2018-v1.txt",
+	"mergefactor" : 10
+	},
+	{"dataset" : "SingleMuon_pancakes-02_Run2017B-31Mar2018-v1",
+	"filelist" : "input/2017/SingleMuon_pancakes-02_Run2017B-31Mar2018-v1.txt",
+	"mergefactor" : 3
+	},
+	{"dataset" : "SingleMuon_pancakes-02_Run2017D-31Mar2018-v1",
+	"filelist" : "input/2017/SingleMuon_pancakes-02_Run2017D-31Mar2018-v1.txt",
+	"mergefactor" : 3
+	},
+	{"dataset" : "SingleMuon_pancakes-02_Run2017E-31Mar2018-v1",
+	"filelist" : "input/2017/SingleMuon_pancakes-02_Run2017E-31Mar2018-v1.txt",
+	"mergefactor" : 3
+	},
+	{"dataset" : "SingleMuon_pancakes-02_Run2017F-31Mar2018-v1",
+	"filelist" : "input/2017/SingleMuon_pancakes-02_Run2017F-31Mar2018-v1.txt",
+	"mergefactor" : 3
 	}
 ]

@@ -7,6 +7,7 @@ DATASET=${!i}; i=$((i+1))
 SHORT=${!i}; i=$((i+1))
 YEAR=${!i}; i=$((i+1))
 ISMC=${!i}; i=$((i+1))
+ISINFER=${!i}; i=$((i+1))
 ICHUNK=${!i}; i=$((i+1))
 SUBDATE=${!i};i=$((i+1))
 CONVERT=${!i};i=$((i+1))
@@ -86,6 +87,28 @@ echo ''
 echo '--- Starting skim'
 echo "${FILES[@]}"
 echo "${CUT}"
+postfix="_post-process"
+IFS=" "
+splitfiles=($FILES)
+unset IFS
+
+for f in "${splitfiles[@]}"
+do
+  IFS="/"
+  split=($f) #$(echo $x | tr "/" " ")  
+  unset IFS
+  postfix="_post-process_${split[-4]}"
+  echo "start python $(date)"
+  #if [[ ${ISINFER} ]]
+  #then 
+  #  python scripts/nano_postproc.py tmp/ $f -I PhysicsTools.NanoAODTools.postprocessing.modules.ZprInference inferencer -c "${CUT}" -s "${postfix}" --bo scripts/keep_and_drop.txt
+  #else
+    python scripts/nano_postproc.py tmp/ $f -I PhysicsTools.NanoAODTools.postprocessing.modules.ZprTraining pfModule -c "${CUT}" -s "${postfix}" --bo scripts/keep_and_drop_training.txt
+  #fi
+
+  echo "done python $(date)"
+done
+
 
 echo "drop FatJetPFCands_*" >> drop_pfcands.txt
 
@@ -105,4 +128,5 @@ echo "start copying $(date)"
 #xrdcp -f tree_${ICHUNK}.root root://cmseos.fnal.gov/${OUTDIR}/
 for i in tmp/*_skim.root; do xrdcp -f $i root://cmseos.fnal.gov/${OUTDIR}/; done
 echo "done copying $(date)"
+
 rm -rf tmp/*
