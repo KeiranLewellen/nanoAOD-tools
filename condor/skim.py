@@ -120,9 +120,9 @@ def setup_dirs(datasets, tag):
             
 
 def main():
-    tag = 'Mar01'
+    tag = 'Apr13'
     skiplist = []
-    whitelist = ['ST','WJets','ZJets']
+    whitelist = ['boostedTau']
     with open("input/fileset_2017.json","r") as f:
         datasets_2017 = json.loads(f.read())
     with open("input/fileset_2018.json","r") as f:

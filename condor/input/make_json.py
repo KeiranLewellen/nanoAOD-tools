@@ -68,6 +68,10 @@ mergefactors = { "JetHT_pancakes-02_Run2017B-09Aug2019_UL2017-v1" : 5,
                  "ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8" : 5,
                  "ttHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8" : 5,
                  "GluGluHTauTau_13TeV" : 20,
+                 "boostedTau_QCD_HT700to1000_TuneCP5_PSWeights_13TeV-madgraphMLM-pythia8" : 2,
+                 "boostedTau_WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8" : 2,
+                 "boostedTau_GluGluHTauTau_boostedTaua_13TeV_user" : 10,
+
                 } 
 for year in ['2017','2018']:
     of = open('fileset_%s.json'%year,'w')

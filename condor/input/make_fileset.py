@@ -7,8 +7,8 @@ eosdir = "/store/group/lpcbacon/pancakes/02/"
 
 dirlist = [
     #["2017/UL/", "2017",["hadd","MET","DYJets","GluGlu","Electron","WJetsToLNu","WW","WZ","ZZ","JetHT/pancakes-02_Run2017B", "QCD_HT100to200", "QCD_HT200to300","QCD_HT50to100","SingleMuon","JetHT","SingleElectron","Tau"],{"SingleMuon":"withPF",},],
-    ["2017/UL/", "2017",["hadd","MET","DYJets","GluGlu","Electron","WJetsToLNu","WW","WZ","ZZ","JetHT/pancakes-02_Run2017B", "QCD_HT100to200", "QCD_HT200to300","QCD_HT50to100","SingleMuon","JetHT","SingleElectron","Tau"],{"SingleMuon":"withPF","SingleElectron":"withPF"},],
-    ["2017/", "2017", ["UL","tmp","JetHT","Single","ZPrime","BulkGrav"],{"GluGluHToTauTau":"TauTau","VBFHToTauTau":"TauTau","WminusHToTauTau":"TauTau","WplusHToTauTau":"TauTau","ZHToTauTau":"TauTau","ggZH_HToTauTau_ZToLL":"TauTau","ggZH_HToTauTau_ZToNuNu":"TauTau","ggZH_HToTauTau_ZToQQ":"TauTau","ttHToTauTau":"TauTau"}],
+    ["2017/UL/", "2017",["hadd","MET","DYJets","GluGlu","Electron","WJetsToLNu","WW","WZ","ZZ","JetHT/pancakes-02_Run2017B", "QCD_HT100to200", "QCD_HT200to300","QCD_HT50to100","SingleMuon","JetHT","SingleElectron","Tau","boostedTaus"],{"SingleMuon":"withPF","SingleElectron":"withPF"},],
+    ["2017/", "2017", ["UL","tmp","JetHT","Single","ZPrime","BulkGrav","boostedTaus"],{"GluGluHToTauTau":"TauTau","VBFHToTauTau":"TauTau","WminusHToTauTau":"TauTau","WplusHToTauTau":"TauTau","ZHToTauTau":"TauTau","ggZH_HToTauTau_ZToLL":"TauTau","ggZH_HToTauTau_ZToNuNu":"TauTau","ggZH_HToTauTau_ZToQQ":"TauTau","ttHToTauTau":"TauTau"}],
     ["2017/tmp-VJets-withPF", "2017",["UL"], {},],#["tmp-VJets-withPF"]],
     ["2017/tmp-VJets-withPF/UL", "2017",[], {},],#["tmp-VJets-withPF"]],
     ["2017/tmp-WJets-withPF", "2017",[], {},],#["tmp-VJets-withPF"]],
@@ -22,6 +22,9 @@ dirlist = [
     #["2017/UL/hadd", "2017ULhadd",["_Run2017B"]]
     #["","2017",[]]   
     ["2018/UL/GluGluHTauTau_13TeV_user", "2018",[], {},],
+    ["2017/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8", "2017", ["pancakes-02_"],{}],
+    ["2017/UL/QCD_HT700to1000_TuneCP5_PSWeights_13TeV-madgraphMLM-pythia8", "2017",["pancakes-02_"],{},],
+    ["2018/UL/GluGluHTauTau_boostedTaua_13TeV_user", "2018",[], {},],
 ]
 
 def eos_rec_search(startdir,suffix,skiplist,dirs,reqs=""):
@@ -57,10 +60,10 @@ for dirs in dirlist:
         name = s.replace('crab_','').replace('_user','')
         if 'SingleMuon' in curdir: name = 'SingleMuon_' + name
         if 'JetHT' in curdir: name = 'JetHT_' + name
-        if 'Tau' in curdir and 'TauTau' not in curdir: name = 'Tau_' + name
+        if 'Tau' in curdir and 'TauTau' not in curdir and 'boosted' not in curdir: name = 'Tau_' + name
         if 'SingleElectron' in curdir: name = 'SingleElectron_' + name
         if 'MET' in curdir: name = 'MET_' + name
-        
+        if 'boostedTau' in curdir: name = "boostedTau_"+dirs[0].split('/')[-1]
 
         requirements = ""
         for k,v in dirs[3].items():

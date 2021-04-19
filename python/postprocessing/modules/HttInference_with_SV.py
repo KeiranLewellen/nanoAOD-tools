@@ -80,9 +80,15 @@ class inferencerClass(Module):
         RV=np.float32(RV)
         RVT=np.transpose(RV)
 
-        self.model4p1_hadhad = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/deepDoubleTau_hadhad_v4.1.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
-        self.model6p1_hadel = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/deepDoubleTau_hadel_v6.1.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
-        self.model6p1_hadmu = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/deepDoubleTau_hadmu_v6.1.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
+        self.model4p1_hadhad_old = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/deepDoubleTau_hadhad_v4.1.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
+        self.model6p1_hadel_old = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/deepDoubleTau_hadel_v6.1.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
+        self.model6p1_hadmu_old = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/deepDoubleTau_hadmu_v6.1.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
+
+        self.model4p1_hadhad = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/IN_hadhad_v4p1,on_QCD,fillFactor=2,200GeV,take_3,model.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
+        self.model6p1_hadel = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/GRU_hadel_v6p1,on_TTbar_WJets,fillFactor=1_5,200GeV,take_6,model.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
+        self.model6p1_hadmu = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/GRU_hadmu_v6p1,on_TTbar_WJets,fillFactor=1_5,200GeV,take_7,model.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
+
+        self.Ztagger = load_model(base+'/src/PhysicsTools/NanoAODTools/data/GRU_ZDecays_v6p1,5_decays,take_3,model.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
 
         #print(self.model4p1_hadhad.summary())
         #print(self.model6p1_hadel.summary())
@@ -135,9 +141,19 @@ class inferencerClass(Module):
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
 
+        self.out.branch("IN_hadhad_v4p1_old", "F", 1)
+        self.out.branch("GRU_hadel_v6p1_old", "F", 1)
+        self.out.branch("GRU_hadmu_v6p1_old", "F", 1)
+
         self.out.branch("IN_hadhad_v4p1", "F", 1)
         self.out.branch("GRU_hadel_v6p1", "F", 1)
         self.out.branch("GRU_hadmu_v6p1", "F", 1)
+
+        self.out.branch("Ztagger_Zee", "F", 1)
+        self.out.branch("Ztagger_Zmm", "F", 1)
+        self.out.branch("Ztagger_Zhh", "F", 1)
+        self.out.branch("Ztagger_Zhe", "F", 1)
+        self.out.branch("Ztagger_Zhm", "F", 1)
 
         self.out.branch("MassReg_hadhad", "F", 1)
         self.out.branch("MassReg_hadel", "F", 1)
@@ -154,18 +170,28 @@ class inferencerClass(Module):
         met = Object(event, "MET")
         pupmet = Object(event, "PuppiMET")
 
+        IN_hadhad_v4p1_old = np.full(1, -1., dtype=np.float32)
+        GRU_hadel_v6p1_old = np.full(1, -1., dtype=np.float32)
+        GRU_hadmu_v6p1_old = np.full(1, -1., dtype=np.float32)
+
         IN_hadhad_v4p1 = np.full(1, -1., dtype=np.float32)
         GRU_hadel_v6p1 = np.full(1, -1., dtype=np.float32)
         GRU_hadmu_v6p1 = np.full(1, -1., dtype=np.float32)
+
+        Ztagger_Zee = np.full(1, -1., dtype=np.float32)
+        Ztagger_Zmm = np.full(1, -1., dtype=np.float32)
+        Ztagger_Zhh = np.full(1, -1., dtype=np.float32)
+        Ztagger_Zhe = np.full(1, -1., dtype=np.float32)
+        Ztagger_Zhm = np.full(1, -1., dtype=np.float32)
 
         MassReg_hadhad = np.full(1, -1., dtype=np.float32)
         MassReg_hadel = np.full(1, -1., dtype=np.float32)
         MassReg_hadmu = np.full(1, -1., dtype=np.float32)
 
-        jet_idx = 0
+        jet_idx = -1
         min_dphi = 999.
         for ij, jet in enumerate(jets):
-            if (jet.pt < 300.): continue
+            if (jet.pt < 200.): continue
             this_dphi = abs(signedDeltaPhi(met.phi, jet.phi))
             if (this_dphi < min_dphi):
                 min_dphi = this_dphi
@@ -305,15 +331,25 @@ class inferencerClass(Module):
             evtData = np.array([met.covXX,met.covXY,met.covYY,signedDeltaPhi(met.phi,jphi),met.pt,met.significance,pupmet.pt,signedDeltaPhi(pupmet.phi,jphi),jeta,jphi,jmsd,jpt])
             evtData = np.expand_dims(evtData,axis=0)
 
-            IN_hadhad_v4p1[0] = float(self.model4p1_hadhad.predict([pfData, svData]))
-            GRU_hadel_v6p1[0] = float(self.model6p1_hadel.predict([pfData, svData]))
-            GRU_hadmu_v6p1[0] = float(self.model6p1_hadmu.predict([pfData, svData]))
+            IN_hadhad_v4p1_old[0] = float(self.model4p1_hadhad_old.predict([pfData, svData]))
+            GRU_hadel_v6p1_old[0] = float(self.model6p1_hadel_old.predict([pfData, svData]))
+            GRU_hadmu_v6p1_old[0] = float(self.model6p1_hadmu_old.predict([pfData, svData]))
 
             idconv = {211.:1, 13.:2,  22.:3,  11.:4, 130.:5, 1.:6, 2.:7, 3.:8, 4.:9,
                 5.:10, -211.:1, -13.:2,
                 -11.:4, -1.:-6, -2.:7, -3.:8, -4.:9, -5.:10, 0.:0}
-            nIDs = 33
             pfData[:,:,-1] = np.vectorize(idconv.__getitem__)(pfData[:,:,-1])
+
+            IN_hadhad_v4p1[0] = float(self.model4p1_hadhad.predict([pfData, svData]))
+            GRU_hadel_v6p1[0] = float(self.model6p1_hadel.predict([pfData, svData]))
+            GRU_hadmu_v6p1[0] = float(self.model6p1_hadmu.predict([pfData, svData]))
+
+            Ztagger_pred = self.Ztagger.predict([pfData, svData])
+            Ztagger_Zee[0] = float(Ztagger_pred[0][0])
+            Ztagger_Zmm[0] = float(Ztagger_pred[0][1])
+            Ztagger_Zhh[0] = float(Ztagger_pred[0][2])
+            Ztagger_Zhe[0] = float(Ztagger_pred[0][3])
+            Ztagger_Zhm[0] = float(Ztagger_pred[0][4])
 
             MassReg_hadhad[0] = float(self.massreg_hadhad.predict([pfData, svData, evtData]))
             MassReg_hadel[0]  = float(self.massreg_hadel.predict([pfData, svData, evtData]))
@@ -339,9 +375,19 @@ class inferencerClass(Module):
 
             # assert abs( 1 - float(self.model.predict(X)[0,1]) - float(self.model.predict(X)[0,0])) < 0.02
             # print(X,IN_hadhad_v4p1[0], GRU_hadel_v6p1[0])
+        self.out.fillBranch("IN_hadhad_v4p1_old", IN_hadhad_v4p1_old)
+        self.out.fillBranch("GRU_hadel_v6p1_old", GRU_hadel_v6p1_old)
+        self.out.fillBranch("GRU_hadmu_v6p1_old", GRU_hadmu_v6p1_old)
+
         self.out.fillBranch("IN_hadhad_v4p1", IN_hadhad_v4p1)
         self.out.fillBranch("GRU_hadel_v6p1", GRU_hadel_v6p1)
         self.out.fillBranch("GRU_hadmu_v6p1", GRU_hadmu_v6p1)
+
+        self.out.fillBranch("Ztagger_Zee", Ztagger_Zee)
+        self.out.fillBranch("Ztagger_Zmm", Ztagger_Zmm)
+        self.out.fillBranch("Ztagger_Zhh", Ztagger_Zhh)
+        self.out.fillBranch("Ztagger_Zhe", Ztagger_Zhe)
+        self.out.fillBranch("Ztagger_Zhm", Ztagger_Zhm)
 
         self.out.fillBranch("MassReg_hadhad", MassReg_hadhad)
         self.out.fillBranch("MassReg_hadel", MassReg_hadel)
