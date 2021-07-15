@@ -7,6 +7,7 @@ DATASET=${!i}; i=$((i+1))
 SHORT=${!i}; i=$((i+1))
 YEAR=${!i}; i=$((i+1))
 ISMC=${!i}; i=$((i+1))
+ISINFER=${!i}; i=$((i+1))
 ICHUNK=${!i}; i=$((i+1))
 SUBDATE=${!i};i=$((i+1))
 CONVERT=${!i};i=$((i+1))
@@ -86,15 +87,46 @@ echo ''
 echo '--- Starting skim'
 echo "${FILES[@]}"
 echo "${CUT}"
+postfix="_post-process"
+IFS=" "
+splitfiles=($FILES)
+unset IFS
+
+for f in "${splitfiles[@]}"
+do
+  IFS="/"
+  split=($f) #$(echo $x | tr "/" " ")  
+  unset IFS
+  postfix="_post-process_${split[-4]}"
+  echo "start python $(date)"
+  #if [[ ${ISINFER} ]]
+  #then 
+  #  python scripts/nano_postproc.py tmp/ $f -I PhysicsTools.NanoAODTools.postprocessing.modules.ZprInference inferencer -c "${CUT}" -s "${postfix}" --bo scripts/keep_and_drop.txt
+  #else
+    python scripts/nano_postproc.py tmp/ $f -I PhysicsTools.NanoAODTools.postprocessing.modules.ZprTraining pfModule -c "${CUT}" -s "${postfix}" --bo scripts/keep_and_drop_training.txt
+  #fi
+
+  echo "done python $(date)"
+done
+
+
+echo "drop FatJetPFCands_*" >> drop_pfcands.txt
 
 echo "start python $(date)"
-python scripts/nano_postproc.py tmp/ ${FILES[@]} -I PhysicsTools.NanoAODTools.postprocessing.modules.HttInference inferencer -c "${CUT}" -s "${DATASET}"
+python scripts/nano_postproc.py tmp/ ${FILES[@]} -I PhysicsTools.NanoAODTools.postprocessing.modules.HttInference_with_SV inferencer -c "${CUT}" -s "${DATASET}" --bo drop_pfcands.txt
 echo "done python $(date)"
 #OUTDIR="/store/user/jkrupa/nanopost_process/${TAG}" 
 #/$(echo $DATASET | sed "s|/| |g" | awk '{print $1}')/${SHORT}/${SUBDATE}/1337/"
 #eos  root://cmseos.fnal.gov/ mkdir -p ${OUTDIR}
+#echo "start copying $(date)"
+#for i in tmp/*; do xrdcp -f $i root://cmseos.fnal.gov/${OUTDIR}/; done
+echo "start hadd $(date)"
+#haddnano.py tree_${ICHUNK}.root tmp/*.root
+for f in tmp/*.root; do haddnano.py "${f%.root}_skim.root" "${f}"; done
+echo "done hadd $(date)"
 echo "start copying $(date)"
-for i in tmp/*; do xrdcp -f $i root://cmseos.fnal.gov/${OUTDIR}/; done
-#xrdcp -pf tmp/* root://cmseos.fnal.gov/${OUTDIR}/ #tree_${ICHUNK}.root
+#xrdcp -f tree_${ICHUNK}.root root://cmseos.fnal.gov/${OUTDIR}/
+for i in tmp/*_skim.root; do xrdcp -f $i root://cmseos.fnal.gov/${OUTDIR}/; done
 echo "done copying $(date)"
+
 rm -rf tmp/*

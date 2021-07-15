@@ -4,14 +4,17 @@ import json
 
 eosbase = "root://cmseos.fnal.gov/"
 eosdir = "/store/group/lpcbacon/pancakes/02/"
-
+#eosdir = "/store/group/lpcbacon/jkrupa/nanopost_process/"
 dirlist = [
     #["2017/UL/", "2017",["hadd","MET","DYJets","GluGlu","Electron","WJetsToLNu","WW","WZ","ZZ","JetHT/pancakes-02_Run2017B", "QCD_HT100to200", "QCD_HT200to300","QCD_HT50to100","SingleMuon","JetHT","SingleElectron","Tau"],{"SingleMuon":"withPF",},],
-    ["2017/UL/", "2017",["hadd","MET","DYJets","GluGlu","Electron","WJetsToLNu","WW","WZ","ZZ","JetHT/pancakes-02_Run2017B", "QCD_HT100to200", "QCD_HT200to300","QCD_HT50to100","SingleMuon","JetHT","SingleElectron","Tau"],{"SingleMuon":"withPF",},],
+    ["2017/UL/", "2017",["hadd","MET","DYJets","GluGlu","Electron","WJetsToLNu","WW","WZ","ZZ","JetHT/pancakes-02_Run2017B", "QCD_HT100to200", "QCD_HT200to300","QCD_HT50to100","SingleMuon","JetHT","SingleElectron","Tau","boostedTaus"],{"SingleMuon":"withPF","SingleElectron":"withPF"},],
+    ["2017/", "2017", ["UL","tmp","JetHT","Single","ZPrime","BulkGrav","boostedTaus"],{"GluGluHToTauTau":"TauTau","VBFHToTauTau":"TauTau","WminusHToTauTau":"TauTau","WplusHToTauTau":"TauTau","ZHToTauTau":"TauTau","ggZH_HToTauTau_ZToLL":"TauTau","ggZH_HToTauTau_ZToNuNu":"TauTau","ggZH_HToTauTau_ZToQQ":"TauTau","ttHToTauTau":"TauTau"}],
     ["2017/tmp-VJets-withPF", "2017",["UL"], {},],#["tmp-VJets-withPF"]],
     ["2017/tmp-VJets-withPF/UL", "2017",[], {},],#["tmp-VJets-withPF"]],
     ["2017/tmp-WJets-withPF", "2017",[], {},],#["tmp-VJets-withPF"]],
     ["2017/UL/SingleMuon","2017",[],{"SingleMuon":"withPF"}],
+    ["2017/UL/SingleElectron","2017",[],{"SingleElectron":"withPF"}],
+    ["2017/UL/MET","2017",[],{"MET":"withPF"}],
     ["2017/UL/JetHT","2017",[],{}], 
     #["2017/UL/Tau","2017",[],{}], 
     #["2017/UL/SingleElectron","2017",[],{}], 
@@ -19,15 +22,18 @@ dirlist = [
     #["2017/UL/hadd", "2017ULhadd",["_Run2017B"]]
     #["","2017",[]]   
     ["2018/UL/GluGluHTauTau_13TeV_user", "2018",[], {},],
+    ["2017/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8", "2017", ["pancakes-02_"],{}],
+    ["2017/UL/QCD_HT700to1000_TuneCP5_PSWeights_13TeV-madgraphMLM-pythia8", "2017",["pancakes-02_"],{},],
+    ["2018/UL/GluGluHTauTau_boostedTaua_13TeV_user", "2018",[], {},],
 ]
 
 def eos_rec_search(startdir,suffix,skiplist,dirs,reqs=""):
     donedirs = []
     dirlook = subprocess.check_output("eos %s ls %s"%(eosbase,startdir), shell=True).decode('utf-8').split("\n")[:-1]
-    print(reqs,startdir)
+    #print(reqs,startdir)
     if reqs not in startdir: return []#os.system("eos %s ls %s"%(eosbase,startdir))): return []
     for d in dirlook:
-        print(reqs,d)
+        #print(reqs,d)
         if d.endswith(suffix):
             #print('file', startdir+"/"+d)
             donedirs.append(startdir+"/"+d)
@@ -42,8 +48,9 @@ def eos_rec_search(startdir,suffix,skiplist,dirs,reqs=""):
     return dirs+donedirs
 
 for dirs in dirlist:
+    print("eos %s ls %s%s"%(eosbase,eosdir,dirs[0]))
     samples = subprocess.check_output("eos %s ls %s%s"%(eosbase,eosdir,dirs[0]), shell=True).decode('utf-8').split("\n")[:-1]
-    print('samples', samples)
+    #print('samples', samples)
     jdict = {}
     for s in samples:
 
@@ -54,15 +61,16 @@ for dirs in dirlist:
         name = s.replace('crab_','').replace('_user','')
         if 'SingleMuon' in curdir: name = 'SingleMuon_' + name
         if 'JetHT' in curdir: name = 'JetHT_' + name
-        if 'Tau' in curdir and 'TauTau' not in curdir: name = 'Tau_' + name
+        if 'Tau' in curdir and 'TauTau' not in curdir and 'boosted' not in curdir: name = 'Tau_' + name
         if 'SingleElectron' in curdir: name = 'SingleElectron_' + name
-        
+        if 'MET' in curdir: name = 'MET_' + name
+        if 'boostedTau' in curdir: name = "boostedTau_"+dirs[0].split('/')[-1]
 
         requirements = ""
         for k,v in dirs[3].items():
             if k in name: requirements = v
         if requirements: print('path for sample %s must contain %s'%(name, requirements))
-        print(curdir)
+        #print(curdir)
         #try: 
          
         #    requirements = dirs[3][s]

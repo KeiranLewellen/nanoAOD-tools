@@ -3,5 +3,9 @@
 	{"dataset" : "GluGluHTauTau_13TeV",
 	"filelist" : "input/2018/GluGluHTauTau_13TeV.txt",
 	"mergefactor" : 20
+	},
+	{"dataset" : "boostedTau_GluGluHTauTau_boostedTaua_13TeV_user",
+	"filelist" : "input/2018/boostedTau_GluGluHTauTau_boostedTaua_13TeV_user.txt",
+	"mergefactor" : 10
 	}
 ]
