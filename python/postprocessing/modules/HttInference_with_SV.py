@@ -157,7 +157,7 @@ class inferencerClass(Module):
 
 
             if jmsd == 0:
-                jLSmsd = np.inf
+                jLSmsd = 0
             else:
                 jLSmsd = jLSmsd/jmsd
 
