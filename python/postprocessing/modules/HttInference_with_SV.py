@@ -1,4 +1,3 @@
-
 import ROOT
 import numpy as np
 ROOT.PyConfig.IgnoreCommandLineOptions = True
@@ -9,6 +8,7 @@ from keras.models import load_model
 import json
 import os
 import tensorflow as tf
+import onnxruntime
 
 class inferencerClass(Module):
     def __init__(self, jetSelection):
@@ -18,122 +18,17 @@ class inferencerClass(Module):
         self.Ntaus = 3
         base = os.environ['CMSSW_BASE']
 
-        #Defines the interaction matrices
+        self.model5p1_hadhad_multi_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_hadhad_v5p1_multiclass,on_QCD_WJets_noLep,fillFactor=1:2:1,eventData,take_1,model.onnx')
 
-        #Defines the recieving matrix for particles
-        RR=[]
-        for i in range(self.Nparts):
-            row=[]
-            for j in range(self.Nparts*(self.Nparts-1)):
-                if j in range(i*(self.Nparts-1),(i+1)*(self.Nparts-1)):
-                    row.append(1.0)
-                else:
-                    row.append(0.0)
-            RR.append(row)
-        RR=np.array(RR)
-        RR=np.float32(RR)
-        RRT=np.transpose(RR)
+        self.IN_hadel_v5p1_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_hadel_v5p1,on_TTbar_WJets,ohe,eventData,take_1,model.onnx')
+        self.IN_hadmu_v5p1_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_hadmu_v5p1,on_TTbar_WJets,ohe,eventData,take_1,model.onnx')
 
-        #Defines the sending matrix for particles
-        RST=[]
-        for i in range(self.Nparts):
-            for j in range(self.Nparts):
-                row=[]
-                for k in range(self.Nparts):
-                    if k == j:
-                        row.append(1.0)
-                    else:
-                        row.append(0.0)
-                RST.append(row)
-        rowsToRemove=[]
-        for i in range(self.Nparts):
-            rowsToRemove.append(i*(self.Nparts+1))
-        RST=np.array(RST)
-        RST=np.float32(RST)
-        RST=np.delete(RST,rowsToRemove,0)
-        RS=np.transpose(RST)
+        self.Ztagger_Zee_Zhe_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_Zhe_v5p1,on_Zee_oneEl_Zhe,ohe,eventZ,take_2,model.onnx')
+        self.Ztagger_Zmm_Zhm_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_Zhm_v5p1,on_Zmm_oneMu_Zhm,ohe,eventZ,take_1,model.onnx')
 
-        #Defines the recieving matrix for the bipartite particle and secondary vertex graph
-        RK=[]
-        for i in range(self.Nparts):
-            row=[]
-            for j in range(self.Nparts*self.Nsvs):
-                if j in range(i*self.Nsvs,(i+1)*self.Nsvs):
-                    row.append(1.0)
-                else:
-                    row.append(0.0)
-            RK.append(row)
-        RK=np.array(RK)
-        RK=np.float32(RK)
-        RKT=np.transpose(RK)
-
-        #Defines the sending matrix for the bipartite particle and secondary vertex graph
-        RV=[]
-        for i in range(self.Nsvs):
-            row=[]
-            for j in range(self.Nparts*self.Nsvs):
-                if j % self.Nsvs == i:
-                    row.append(1.0)
-                else:
-                    row.append(0.0)
-            RV.append(row)
-        RV=np.array(RV)
-        RV=np.float32(RV)
-        RVT=np.transpose(RV)
-
-        #self.model4p1_hadhad_old = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/IN_hadhad_v4p1,on_QCD,fillFactor=2,200GeV,take_3,model.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
-        #self.model6p1_hadel_old = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/GRU_hadel_v6p1,on_TTbar_WJets,fillFactor=1_5,200GeV,ohe,take_8,model.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
-        #self.model6p1_hadmu_old = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/GRU_hadmu_v6p1,on_TTbar_WJets,fillFactor=1_5,200GeV,ohe,take_8,model.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
-
-        self.model4p1_hadhad = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/IN_hadhad_v4p1,on_QCD,fillFactor=2,200GeV,ohe,take_5,model.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
-        self.model4p1_hadel = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/IN_hadel_v4p1,on_TTbar_WJets,fillFactor=1_5,200GeV,ohe,take_1,model.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
-        self.model4p1_hadmu = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/IN_hadmu_v4p1,on_TTbar_WJets,fillFactor=1_5,200GeV,ohe,take_1,model.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
-
-        self.postTagger1p1_hadhad = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/PostTagger_hadhad_v1p1,on_QCD,take_1,model.h5')
-        self.postTagger1p1_hadel = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/PostTagger_hadel_v1p1,on_TTbar_WJets,take_1,model.h5')
-        self.postTagger1p1_hadmu = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/PostTagger_hadmu_v1p1,on_TTbar_WJets,take_1,model.h5')
-
-        self.Ztagger = load_model(base+'/src/PhysicsTools/NanoAODTools/data/GRU_ZDecays_v6p1,5_decays,take_3,model.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
-
-        #print(self.model4p1_hadhad.summary())
-        #print(self.model6p1_hadel.summary())
-        #print(self.model6p1_hadmu.summary())
-
-#        json_file_hadhad = open(base+ '/src/PhysicsTools/NanoAODTools/data/fullmodel_hadhad_regression_v0.json', 'r')
-#        model_json_hadhad = json_file_hadhad.read()
-#        self.massreg_hadhad = model_from_json(model_json_hadhad)
-#        self.massreg_hadhad.load_weights(base+ '/src/PhysicsTools/NanoAODTools/data/fullmodel_hadhad_regression_v0_weights.h5')
-#
-#        json_file_hadel = open(base+ '/src/PhysicsTools/NanoAODTools/data/fullmodel_hadel_regression_v0.json', 'r')
-#        model_json_hadel = json_file_hadel.read()
-#        self.massreg_hadel = model_from_json(model_json_hadel)
-#        self.massreg_hadel.load_weights(base+ '/src/PhysicsTools/NanoAODTools/data/fullmodel_hadel_regression_v0_weights.h5')
-#
-#        json_file_hadmu = open(base+ '/src/PhysicsTools/NanoAODTools/data/fullmodel_hadmu_regression_v0.json', 'r')
-#        model_json_hadmu = json_file_hadmu.read()
-#        self.massreg_hadmu = model_from_json(model_json_hadmu)
-#        self.massreg_hadmu.load_weights(base+ '/src/PhysicsTools/NanoAODTools/data/fullmodel_hadmu_regression_v0_weights.h5')
-
-        #self.massreg_hadhad = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/fullmodel_hadhad_regression_v0.h5')
-        #self.massreg_hadel = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/fullmodel_hadel_regression_v0.h5')
-        #self.massreg_hadmu = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/fullmodel_hadmu_regression_v0.h5')
-        self.massreg_hadhad = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/mass_and_pt_regression_hadhad_v1.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
-        self.massreg_hadel = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/mass_and_pt_regression_hadel_v1.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
-        self.massreg_hadmu = load_model(base+ '/src/PhysicsTools/NanoAODTools/data/mass_and_pt_regression_hadmu_v1.h5',custom_objects={'tf': tf,'RK': RK,'RV': RV,'RS': RS,'RR': RR,'RRT': RRT,'RKT': RKT})
-
-        #self.massreg_hadhad = load_model(base+ '/src/TrainMassReg/models/fullmodel_hadhad_regression_001_norm_mae_add13k.h5',custom_objects={'tf':tf})
-        #self.massreg_hadel = load_model(base+ '/src/TrainMassReg/models/fullmodel_hadel_regression_v0.h5',custom_objects={'tf':tf})
-        #self.massreg_hadmu = load_model(base+ '/src/TrainMassReg/models/fullmodel_hadmu_regression_v0.h5',custom_objects={'tf':tf})
-
-        #print('HADHAD')
-        #print(self.massreg_hadhad.summary())
-        #print(self.massreg_hadhad.get_weights())
-        #print('HADEL')
-        #print(self.massreg_hadel.summary())
-        #print(self.massreg_hadel.get_weights())
-        #print('HADMU')
-        #print(self.massreg_hadmu.summary())
-        #print(self.massreg_hadmu.get_weights())
+        self.MassReg_hadhad_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/hadhad_H20000_Z25000_Lambda0.01_FLAT500k_genPtCut400.onnx')
+        self.MassReg_hadel_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/hadel_H15000_Z15000_Lambda0.1_hadel_FLAT300k_genPtCut300.onnx')
+        self.MassReg_hadmu_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/hadmu_H9000_Z15000_Lambda0.01_hadmu_FLAT300k_genPtCut300.onnx')
 
         self.log_pf = []
         self.log_sv = []
@@ -150,25 +45,23 @@ class inferencerClass(Module):
         self.out = wrappedOutputTree
 
 
-        self.out.branch("IN_hadhad_v4p1", "F", 1)
-        self.out.branch("IN_hadel_v4p1", "F", 1)
-        self.out.branch("IN_hadmu_v4p1", "F", 1)
+        #self.out.branch("IN_hadhad_v4p1", "F", 1)
+        self.out.branch("IN_hadel_v5p1", "F", 1)
+        self.out.branch("IN_hadmu_v5p1", "F", 1)
 
-        self.out.branch("PostTagger_hadhad_v1p1", "F", 1)
-        self.out.branch("PostTagger_hadel_v1p1", "F", 1)
-        self.out.branch("PostTagger_hadmu_v1p1", "F", 1)
+        self.out.branch("Ztagger_v5p1_Zee_Zhe", "F", 1)
+        self.out.branch("Ztagger_v5p1_Zmm_Zhm", "F", 1)
 
-        self.out.branch("Ztagger_Zee", "F", 1)
-        self.out.branch("Ztagger_Zmm", "F", 1)
-        self.out.branch("Ztagger_Zhh", "F", 1)
-        self.out.branch("Ztagger_Zhe", "F", 1)
-        self.out.branch("Ztagger_Zhm", "F", 1)
+        self.out.branch("IN_hadhad_v5p1_multi_Higgs", "F", 1)
+        self.out.branch("IN_hadhad_v5p1_multi_QCD", "F", 1)
+        self.out.branch("IN_hadhad_v5p1_multi_WJets", "F", 1)
 
         self.out.branch("MassReg_hadhad_mass", "F", 1)
-        self.out.branch("MassReg_hadhad_pt", "F", 1)
         self.out.branch("MassReg_hadel_mass", "F", 1)
-        self.out.branch("MassReg_hadel_pt", "F", 1)
         self.out.branch("MassReg_hadmu_mass", "F", 1)
+
+        self.out.branch("MassReg_hadhad_pt", "F", 1)
+        self.out.branch("MassReg_hadel_pt", "F", 1)
         self.out.branch("MassReg_hadmu_pt", "F", 1)
 
 
@@ -184,26 +77,22 @@ class inferencerClass(Module):
         met = Object(event, "MET")
         pupmet = Object(event, "PuppiMET")
 
+        Ztagger_Zee_Zhe = np.full(1, -1., dtype=np.float32)
+        Ztagger_Zmm_Zhm = np.full(1, -1., dtype=np.float32)
 
-        IN_hadhad_v4p1 = np.full(1, -1., dtype=np.float32)
-        IN_hadel_v4p1 = np.full(1, -1., dtype=np.float32)
-        IN_hadmu_v4p1 = np.full(1, -1., dtype=np.float32)
+        IN_hadel_v5p1 = np.full(1, -1., dtype=np.float32)
+        IN_hadmu_v5p1 = np.full(1, -1., dtype=np.float32)
 
-        PostTagger_hadhad_v1p1 = np.full(1, -1., dtype=np.float32)
-        PostTagger_hadel_v1p1 = np.full(1, -1., dtype=np.float32)
-        PostTagger_hadmu_v1p1 = np.full(1, -1., dtype=np.float32)
-
-        Ztagger_Zee = np.full(1, -1., dtype=np.float32)
-        Ztagger_Zmm = np.full(1, -1., dtype=np.float32)
-        Ztagger_Zhh = np.full(1, -1., dtype=np.float32)
-        Ztagger_Zhe = np.full(1, -1., dtype=np.float32)
-        Ztagger_Zhm = np.full(1, -1., dtype=np.float32)
+        IN_hadhad_v5p1_multi_Higgs = np.full(1, -1., dtype=np.float32)
+        IN_hadhad_v5p1_multi_QCD = np.full(1, -1., dtype=np.float32)
+        IN_hadhad_v5p1_multi_WJets = np.full(1, -1., dtype=np.float32)
 
         MassReg_hadhad_mass = np.full(1, -1., dtype=np.float32)
-        MassReg_hadhad_pt   = np.full(1, -1., dtype=np.float32)
         MassReg_hadel_mass = np.full(1, -1., dtype=np.float32)
-        MassReg_hadel_pt = np.full(1, -1., dtype=np.float32)
         MassReg_hadmu_mass = np.full(1, -1., dtype=np.float32)
+
+        MassReg_hadhad_pt   = np.full(1, -1., dtype=np.float32)
+        MassReg_hadel_pt = np.full(1, -1., dtype=np.float32)
         MassReg_hadmu_pt = np.full(1, -1., dtype=np.float32)
 
         jet_idx = -1
@@ -265,6 +154,12 @@ class inferencerClass(Module):
                 jLStau43 = float(jet.LStau4) / float(jet.LStau3)
             except:
                 jLStau43 = 0.
+
+
+            if jmsd == 0:
+                jLSmsd = 0
+            else:
+                jLSmsd = jLSmsd/jmsd
 
             jetv = ROOT.TLorentzVector()
             jetv.SetPtEtaPhiM(jet.pt, jet.eta, jet.phi, jet.mass)
@@ -365,7 +260,18 @@ class inferencerClass(Module):
             pfdz = np.zeros(self.Nparts, dtype=np.float16)
             pfdxy = np.zeros(self.Nparts, dtype=np.float16)
             pfdxyerr = np.zeros(self.Nparts, dtype=np.float16)
+            pfvtx = np.zeros(self.Nparts, dtype=np.float16)
             arrIdx = 0
+            jMuonEnergy = np.float16(0)
+            jElectronEnergy = np.float16(0)
+            jPhotonEnergy = np.float16(0)
+            jChargedHadronEnergy = np.float16(0)
+            jNeutralHadronEnergy = np.float16(0)
+            jMuonNum = np.float16(0)
+            jElectronNum = np.float16(0)
+            jPhotonNum = np.float16(0)
+            jChargedHadronNum = np.float16(0)
+            jNeutralHadronNum = np.float16(0)
             for ip, part in enumerate(pfcands):
                 if ip not in candrange: continue
                 if arrIdx == self.Nparts: break
@@ -380,22 +286,55 @@ class inferencerClass(Module):
                 pfdxy[arrIdx] = part.d0
                 pfdxyerr[arrIdx] = part.d0Err
                 pftrk[arrIdx] = part.trkChi2
+                pfvtx[arrIdx] = part.vtxChi2
+                if part.pdgId in [-13., 13.]:
+                    jMuonEnergy += part.pt
+                    jMuonNum += 1
+                if part.pdgId in [-11., 11.]:
+                    jElectronEnergy += part.pt
+                    jElectronNum += 1
+                if part.pdgId in [22.]:
+                    jPhotonEnergy += part.pt
+                    jPhotonNum += 1
+                if part.pdgId in [-211., 211.]:
+                    jChargedHadronEnergy += part.pt
+                    jChargedHadronNum += 1
+                if part.pdgId in [-111., 111.,  130.]:
+                    jNeutralHadronEnergy += part.pt
+                    jNeutralHadronNum += 1
                 arrIdx += 1
 
-            # print(pfpt,pfeta,pfphi,pfdz,pfd0)
-            ##define and reshape features
+
+            # Define and reshape features
+
             pfData = np.vstack([pfpt, pfeta, pfphi, pfq, pfdz, pfdxy, pfdxyerr, pfpup, pfpupnolep, pfid])
             pfData = np.transpose(pfData)
             pfData = np.expand_dims(pfData,axis=0)
+
+            pfDataMore = np.vstack([pfpt, pfeta, pfphi, pfq, pfdz, pfdxy, pfdxyerr, pfpup, pfpupnolep, pfid, pftrk, pfvtx])
+            pfDataMore = np.transpose(pfDataMore)
+            pfDataMore = np.expand_dims(pfDataMore, axis=0)
+
             svData = np.vstack([svdlen,svdlenSig, svdxy, svdxySig, svchi2, svpAngle, svx, svy, svz, svpt, svmass, sveta, svphi])
             svData = np.transpose(svData)
             svData = np.expand_dims(svData, axis=0)
+
             #["MET_covXX","MET_covXY","MET_covYY","MET_phi","MET_pt","MET_significance","PuppiMET_pt","PuppiMET_phi","fj_eta","fj_phi","fj_msd","fj_pt"]
             #evtData = np.array([met.covXX,met.covXY,met.covYY,met.phi,met.pt,met.significance,pupmet.pt,pupmet.phi,jeta,jphi,jmsd,jpt])
-            evtData = np.array([met.covXX,met.covXY,met.covYY,signedDeltaPhi(met.phi,jphi),met.pt,met.significance,pupmet.pt,signedDeltaPhi(pupmet.phi,jphi),jeta,jphi,jmsd,jpt])
-            evtData_sangeon = np.array([met.covXX,met.covXY,met.covYY,signedDeltaPhi(met.phi,jphi),met.pt,met.significance,pupmet.pt,signedDeltaPhi(pupmet.phi,jphi),jmsd,jpt,jeta,jphi])
-            evtData = np.expand_dims(evtData,axis=0)
-            evtData_sangeon = np.expand_dims(evtData_sangeon,axis=0)
+            #evtData = np.array([met.covXX,met.covXY,met.covYY,signedDeltaPhi(met.phi,jphi),met.pt,met.significance,pupmet.pt,signedDeltaPhi(pupmet.phi,jphi),jeta,jphi,jmsd,jpt])
+
+            evtData_reg = np.array([met.covXX,met.covXY,met.covYY,signedDeltaPhi(met.phi,jphi),met.pt,met.significance,pupmet.pt,signedDeltaPhi(pupmet.phi,jphi),jmsd,jpt,jeta,jphi])
+            evtData_reg = np.expand_dims(evtData_reg,axis=0)
+
+            evtZ = np.array([jMuonEnergy/jpt, jElectronEnergy/jpt, jPhotonEnergy/jpt, jChargedHadronEnergy/jpt, jNeutralHadronEnergy/jpt, jMuonNum, jElectronNum, jPhotonNum, jChargedHadronNum, jNeutralHadronNum, jLSpt/jpt])
+            evtZ = np.expand_dims(evtZ,axis=0)
+
+            evtData = np.array(
+                [jMuonEnergy / jpt, jElectronEnergy / jpt, jPhotonEnergy / jpt, jChargedHadronEnergy / jpt,
+                 jNeutralHadronEnergy / jpt, jMuonNum, jElectronNum, jPhotonNum, jChargedHadronNum, jNeutralHadronNum,
+                 jLSpt / jpt, jLSmsd])
+            evtData = np.expand_dims(evtData, axis=0)
+
 
             tauData = np.vstack([tau_charge, tau_chargedIso, tau_dxy, tau_dz, tau_eta, tau_leadTkDeltaEta, tau_leadTkDeltaPhi, tau_leadTkPtOverTauPt, tau_mass, tau_neutralIso, tau_phi, tau_photonsOutsideSignalCone, tau_pt, tau_rawAntiEle, tau_rawIso, tau_rawIsodR03, tau_rawMVAoldDM2017v2, tau_rawMVAoldDMdR032017v2])
             tauData = np.transpose(tauData)
@@ -405,77 +344,105 @@ class inferencerClass(Module):
                 5.:10, -211.:1, -13.:2,
                 -11.:4, -1.:-6, -2.:7, -3.:8, -4.:9, -5.:10, 0.:0}
             pfData[:,:,-1] = np.vectorize(idconv.__getitem__)(pfData[:,:,-1])
+            pfDataMore[:, :, -3] = np.vectorize(idconv.__getitem__)(pfDataMore[:, :, -3]) # remember which column the pfids are in
 
-            Ztagger_pred = self.Ztagger.predict([pfData, svData])
-            Ztagger_Zee[0] = float(Ztagger_pred[0][0])
-            Ztagger_Zmm[0] = float(Ztagger_pred[0][1])
-            Ztagger_Zhh[0] = float(Ztagger_pred[0][2])
-            Ztagger_Zhe[0] = float(Ztagger_pred[0][3])
-            Ztagger_Zhm[0] = float(Ztagger_pred[0][4])
-
-            MassReg_hadhad_pred = self.massreg_hadhad.predict([pfData, svData, evtData_sangeon])
-            MassReg_hadhad_mass[0] = float(MassReg_hadhad_pred[0][0])
-            MassReg_hadhad_pt[0] = float(MassReg_hadhad_pred[0][1])
-
-            MassReg_hadel_pred = self.massreg_hadel.predict([pfData, svData, evtData_sangeon])
-            MassReg_hadel_mass[0] = float(MassReg_hadel_pred[0][0])
-            MassReg_hadel_pt[0] = float(MassReg_hadel_pred[0][1])
-
-            MassReg_hadmu_pred = self.massreg_hadmu.predict([pfData, svData, evtData_sangeon])
-            MassReg_hadmu_mass[0] = float(MassReg_hadmu_pred[0][0])
-            MassReg_hadmu_pt[0] = float(MassReg_hadmu_pred[0][1])
+            pfData_reg = pfData
 
             idlist = np.abs(pfData[:,:,-1]).astype(int)
-            pfData = np.concatenate([pfData[:,:,:-1],np.eye(11)[idlist]],axis=-1)#relies on number of IDs being 11, be careful
+            pfData = np.concatenate([pfData[:,:,:-1],np.eye(11)[idlist]],axis=-1)  # relies on number of IDs being 11, be careful
 
-            IN_hadhad_v4p1[0] = float(self.model4p1_hadhad.predict([pfData, svData]))
-            IN_hadel_v4p1[0] = float(self.model4p1_hadel.predict([pfData, svData]))
-            IN_hadmu_v4p1[0] = float(self.model4p1_hadmu.predict([pfData, svData]))
+            idlistMore = np.abs(pfData[:,:,-3]).astype(int)
+            pfDataMore = np.concatenate([pfDataMore[:, :, :-3], np.eye(11)[idlistMore],pfDataMore[:, :, -2:]],axis=-1)  # relies on number of IDs being 11, be careful
 
-            PostTagger_hadhad_v1p1[0] = float(self.postTagger1p1_hadhad.predict([tauData, IN_hadhad_v4p1]))
-            PostTagger_hadel_v1p1[0] = float(self.postTagger1p1_hadel.predict([tauData, IN_hadel_v4p1]))
-            PostTagger_hadmu_v1p1[0] = float(self.postTagger1p1_hadmu.predict([tauData, IN_hadmu_v4p1]))
+            pfData = pfData.astype(np.float32)
+            pfDataMore = pfDataMore.astype(np.float32)
+            svData = svData.astype(np.float32)
+            evtData = evtData.astype(np.float32)
+            evtZ = evtZ.astype(np.float32)
+            evtData_reg = evtData_reg.astype(np.float32)
+            pfData_reg = pfData_reg.astype(np.float32)
 
-            #self.log_pf.append(pfData)
-            #self.log_sv.append(svData)
-            #self.log_evt.append(evtData)
-            #self.log_mreg.append(np.array([MassReg_hadhad[0], MassReg_hadel[0], MassReg_hadmu[0]]))
+            # Performs inference using models
 
-            #with open('test.npy', 'wb') as f:
-            #    np.save(f, np.vstack(self.log_pf))
-            #    np.save(f, np.vstack(self.log_sv))
-            #    np.save(f, np.vstack(self.log_evt))
-            #    np.save(f, np.vstack(self.log_mreg))
-                #np.save(f, pfData)
-                #np.save(f, svData)
-                #np.save(f, evtData)
-                #np.save(f, np.array([MassReg_hadhad[0], MassReg_hadel[0], MassReg_hadmu[0]]))
-                #np.save(f, self.massreg_hadhad.get_weights())
-                #np.save(f, self.massreg_hadel.get_weights())
-                #np.save(f, self.massreg_hadmu.get_weights())
+            IN_hadel_v5p1[0] = float(
+                self.IN_hadel_v5p1_session.run([self.IN_hadel_v5p1_session.get_outputs()[0].name],
+                                                 {self.IN_hadel_v5p1_session.get_inputs()[0].name: evtData,
+                                                  self.IN_hadel_v5p1_session.get_inputs()[1].name: pfDataMore,
+                                                  self.IN_hadel_v5p1_session.get_inputs()[2].name: svData})[0][0])
 
-            # assert abs( 1 - float(self.model.predict(X)[0,1]) - float(self.model.predict(X)[0,0])) < 0.02
-            # print(X,IN_hadhad_v4p1[0], GRU_hadel_v6p1[0])
+            IN_hadmu_v5p1[0] = float(
+                self.IN_hadmu_v5p1_session.run([self.IN_hadmu_v5p1_session.get_outputs()[0].name],
+                                               {self.IN_hadel_v5p1_session.get_inputs()[0].name: evtData,
+                                                self.IN_hadmu_v5p1_session.get_inputs()[1].name: pfDataMore,
+                                                self.IN_hadmu_v5p1_session.get_inputs()[2].name: svData})[0][0])
 
-        self.out.fillBranch("IN_hadhad_v4p1", IN_hadhad_v4p1)
-        self.out.fillBranch("IN_hadel_v4p1", IN_hadel_v4p1)
-        self.out.fillBranch("IN_hadmu_v4p1", IN_hadmu_v4p1)
+            Ztagger_Zee_Zhe[0] = float(
+                self.Ztagger_Zee_Zhe_session.run([self.Ztagger_Zee_Zhe_session.get_outputs()[0].name],
+                                                {self.Ztagger_Zee_Zhe_session.get_inputs()[0].name: evtZ,
+                                                 self.Ztagger_Zee_Zhe_session.get_inputs()[1].name: pfDataMore,
+                                                 self.Ztagger_Zee_Zhe_session.get_inputs()[2].name: svData})[0][0])
+            Ztagger_Zmm_Zhm[0] = float(
+                self.Ztagger_Zmm_Zhm_session.run([self.Ztagger_Zmm_Zhm_session.get_outputs()[0].name],
+                                                {self.Ztagger_Zmm_Zhm_session.get_inputs()[0].name: evtZ,
+                                                 self.Ztagger_Zmm_Zhm_session.get_inputs()[1].name: pfDataMore,
+                                                 self.Ztagger_Zmm_Zhm_session.get_inputs()[2].name: svData})[0][0])
 
-        self.out.fillBranch("Ztagger_Zee", Ztagger_Zee)
-        self.out.fillBranch("Ztagger_Zmm", Ztagger_Zmm)
-        self.out.fillBranch("Ztagger_Zhh", Ztagger_Zhh)
-        self.out.fillBranch("Ztagger_Zhe", Ztagger_Zhe)
-        self.out.fillBranch("Ztagger_Zhm", Ztagger_Zhm)
 
-        self.out.fillBranch("PostTagger_hadhad_v1p1", PostTagger_hadhad_v1p1)
-        self.out.fillBranch("PostTagger_hadel_v1p1", PostTagger_hadel_v1p1)
-        self.out.fillBranch("PostTagger_hadmu_v1p1", PostTagger_hadmu_v1p1)
+            IN_hadhad_v5p1_multi_pred = self.model5p1_hadhad_multi_session.run(
+                [self.model5p1_hadhad_multi_session.get_outputs()[0].name],
+                {self.model5p1_hadhad_multi_session.get_inputs()[0].name: evtData,
+                 self.model5p1_hadhad_multi_session.get_inputs()[1].name: pfDataMore,
+                 self.model5p1_hadhad_multi_session.get_inputs()[2].name: svData})
+
+            IN_hadhad_v5p1_multi_Higgs[0] = float(IN_hadhad_v5p1_multi_pred[0][0][0])
+            IN_hadhad_v5p1_multi_QCD[0] = float(IN_hadhad_v5p1_multi_pred[0][0][1])
+            IN_hadhad_v5p1_multi_WJets[0] = float(IN_hadhad_v5p1_multi_pred[0][0][2])
+
+            MassReg_hadhad_pred = self.MassReg_hadhad_session.run(
+                [self.MassReg_hadhad_session.get_outputs()[0].name],
+                {self.MassReg_hadhad_session.get_inputs()[0].name: evtData_reg,
+                 self.MassReg_hadhad_session.get_inputs()[1].name: pfData_reg,
+                 self.MassReg_hadhad_session.get_inputs()[2].name: svData})
+
+            MassReg_hadhad_mass[0] = float(MassReg_hadhad_pred[0][0][0])
+            MassReg_hadhad_pt[0] = float(MassReg_hadhad_pred[0][0][1])
+
+            MassReg_hadel_pred = self.MassReg_hadel_session.run(
+                [self.MassReg_hadel_session.get_outputs()[0].name],
+                {self.MassReg_hadel_session.get_inputs()[0].name: evtData_reg,
+                 self.MassReg_hadel_session.get_inputs()[1].name: pfData_reg,
+                 self.MassReg_hadel_session.get_inputs()[2].name: svData})
+
+            MassReg_hadel_mass[0] = float(MassReg_hadel_pred[0][0][0])
+            MassReg_hadel_pt[0] = float(MassReg_hadel_pred[0][0][1])
+
+            MassReg_hadmu_pred = self.MassReg_hadmu_session.run(
+                [self.MassReg_hadmu_session.get_outputs()[0].name],
+                {self.MassReg_hadmu_session.get_inputs()[0].name: evtData_reg,
+                 self.MassReg_hadmu_session.get_inputs()[1].name: pfData_reg,
+                 self.MassReg_hadmu_session.get_inputs()[2].name: svData})
+
+            MassReg_hadmu_mass[0] = float(MassReg_hadmu_pred[0][0][0])
+            MassReg_hadmu_pt[0] = float(MassReg_hadmu_pred[0][0][1])
+
+        # Fills out branches
+
+        self.out.fillBranch("IN_hadel_v5p1", IN_hadel_v5p1)
+        self.out.fillBranch("IN_hadmu_v5p1", IN_hadmu_v5p1)
+
+        self.out.fillBranch("Ztagger_v5p1_Zee_Zhe", Ztagger_Zee_Zhe)
+        self.out.fillBranch("Ztagger_v5p1_Zmm_Zhm", Ztagger_Zmm_Zhm)
+
+        self.out.fillBranch("IN_hadhad_v5p1_multi_Higgs", IN_hadhad_v5p1_multi_Higgs)
+        self.out.fillBranch("IN_hadhad_v5p1_multi_QCD", IN_hadhad_v5p1_multi_QCD)
+        self.out.fillBranch("IN_hadhad_v5p1_multi_WJets", IN_hadhad_v5p1_multi_WJets)
 
         self.out.fillBranch("MassReg_hadhad_mass", MassReg_hadhad_mass)
-        self.out.fillBranch("MassReg_hadhad_pt", MassReg_hadhad_pt)
         self.out.fillBranch("MassReg_hadel_mass", MassReg_hadel_mass)
-        self.out.fillBranch("MassReg_hadel_pt", MassReg_hadel_pt)
         self.out.fillBranch("MassReg_hadmu_mass", MassReg_hadmu_mass)
+
+        self.out.fillBranch("MassReg_hadhad_pt", MassReg_hadhad_pt)
+        self.out.fillBranch("MassReg_hadel_pt", MassReg_hadel_pt)
         self.out.fillBranch("MassReg_hadmu_pt", MassReg_hadmu_pt)
         return True
 
