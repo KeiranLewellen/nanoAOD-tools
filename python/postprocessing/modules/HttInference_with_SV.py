@@ -1,3 +1,4 @@
+
 import ROOT
 import numpy as np
 ROOT.PyConfig.IgnoreCommandLineOptions = True
@@ -161,7 +162,7 @@ class inferencerClass(Module):
 
 
             if jmsd == 0:
-                jLSmsd = 0
+                jLSmsd = np.inf
             else:
                 jLSmsd = jLSmsd/jmsd
 
@@ -355,7 +356,7 @@ class inferencerClass(Module):
             idlist = np.abs(pfData[:,:,-1]).astype(int)
             pfData = np.concatenate([pfData[:,:,:-1],np.eye(11)[idlist]],axis=-1)  # relies on number of IDs being 11, be careful
 
-            idlistMore = np.abs(pfData[:,:,-3]).astype(int)
+            idlistMore = np.abs(pfDataMore[:,:,-3]).astype(int)
             pfDataMore = np.concatenate([pfDataMore[:, :, :-3], np.eye(11)[idlistMore],pfDataMore[:, :, -2:]],axis=-1)  # relies on number of IDs being 11, be careful
 
             pfData = pfData.astype(np.float32)
@@ -376,7 +377,7 @@ class inferencerClass(Module):
 
             IN_hadmu_v5p1[0] = float(
                 self.IN_hadmu_v5p1_session.run([self.IN_hadmu_v5p1_session.get_outputs()[0].name],
-                                               {self.IN_hadel_v5p1_session.get_inputs()[0].name: evtData,
+                                               {self.IN_hadmu_v5p1_session.get_inputs()[0].name: evtData,
                                                 self.IN_hadmu_v5p1_session.get_inputs()[1].name: pfDataMore,
                                                 self.IN_hadmu_v5p1_session.get_inputs()[2].name: svData})[0][0])
 
