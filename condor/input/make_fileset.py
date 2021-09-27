@@ -21,7 +21,13 @@ dirlist = [
     #["2018/UL", "2018UL",["200211_180642"]],
     #["2017/UL/hadd", "2017ULhadd",["_Run2017B"]]
     #["","2017",[]]   
+    #["../../../../../store/user/lpcdihiggsboost/cmantill/PFNano/2017_UL_ak15/", "2017", ["QCD","TT","WJets","TauTau",".tar.gz"], {},],
+    ["2018/", "2018",["WJetsToLNu_TuneCP5","UL"], {},],
     ["2018/UL/GluGluHTauTau_13TeV_user", "2018",[], {},],
+    ["2018/UL/MET", "2018",[], {},],
+    ["2018/UL/EGamma", "2018",[], {},],
+    ["2018/UL/SingleMuon", "2018",[], {},],
+    ["2017/DYJetsToLL_Pt-400To650_TuneCP5_13TeV-amcatnloFXFX-pythia8", "2017", ["pancakes-02_"],{}],
     ["2017/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8", "2017", ["pancakes-02_"],{}],
     ["2017/UL/QCD_HT700to1000_TuneCP5_PSWeights_13TeV-madgraphMLM-pythia8", "2017",["pancakes-02_"],{},],
     ["2018/UL/GluGluHTauTau_boostedTaua_13TeV_user", "2018",[], {},],
@@ -63,6 +69,7 @@ for dirs in dirlist:
         if 'JetHT' in curdir: name = 'JetHT_' + name
         if 'Tau' in curdir and 'TauTau' not in curdir and 'boosted' not in curdir: name = 'Tau_' + name
         if 'SingleElectron' in curdir: name = 'SingleElectron_' + name
+        if 'EGamma' in curdir: name = 'EGamma_' + name
         if 'MET' in curdir: name = 'MET_' + name
         if 'boostedTau' in curdir: name = "boostedTau_"+dirs[0].split('/')[-1]
 

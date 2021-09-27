@@ -4,11 +4,11 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 from array import array
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
-from keras.models import load_model
+#from keras.models import load_model
 import json
 import os
-import tensorflow as tf
-import onnxruntime
+#import tensorflow as tf
+import onnxruntime as rt
 
 class inferencerClass(Module):
     def __init__(self, jetSelection):
@@ -18,17 +18,21 @@ class inferencerClass(Module):
         self.Ntaus = 3
         base = os.environ['CMSSW_BASE']
 
-        self.model5p1_hadhad_multi_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_hadhad_v5p1_multiclass,on_QCD_WJets_noLep,fillFactor=1:2:1,eventData,take_1,model.onnx')
+        self.options = rt.SessionOptions() 
+        self.options.intra_op_num_threads = 1
+        self.options.inter_op_num_threads = 1
 
-        self.IN_hadel_v5p1_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_hadel_v5p1,on_TTbar_WJets,ohe,eventData,take_1,model.onnx')
-        self.IN_hadmu_v5p1_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_hadmu_v5p1,on_TTbar_WJets,ohe,eventData,take_1,model.onnx')
+        self.model5p1_hadhad_multi_session = rt.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_hadhad_v5p1_multiclass,on_QCD_WJets_noLep,fillFactor=1:2:1,eventData,take_1,model.onnx', self.options)
 
-        self.Ztagger_Zee_Zhe_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_Zhe_v5p1,on_Zee_oneEl_Zhe,ohe,eventZ,take_2,model.onnx')
-        self.Ztagger_Zmm_Zhm_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_Zhm_v5p1,on_Zmm_oneMu_Zhm,ohe,eventZ,take_1,model.onnx')
+        self.IN_hadel_v5p1_session = rt.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_hadel_v5p1,on_TTbar_WJets,ohe,eventData,take_1,model.onnx', self.options)
+        self.IN_hadmu_v5p1_session = rt.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_hadmu_v5p1,on_TTbar_WJets,ohe,eventData,take_1,model.onnx', self.options)
 
-        self.MassReg_hadhad_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/hadhad_H20000_Z25000_Lambda0.01_FLAT500k_genPtCut400.onnx')
-        self.MassReg_hadel_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/hadel_H15000_Z15000_Lambda0.1_hadel_FLAT300k_genPtCut300.onnx')
-        self.MassReg_hadmu_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/hadmu_H9000_Z15000_Lambda0.01_hadmu_FLAT300k_genPtCut300.onnx')
+        self.Ztagger_Zee_Zhe_session = rt.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_Zhe_v5p1,on_Zee_oneEl_Zhe,ohe,eventZ,take_2,model.onnx', self.options)
+        self.Ztagger_Zmm_Zhm_session = rt.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_Zhm_v5p1,on_Zmm_oneMu_Zhm,ohe,eventZ,take_1,model.onnx', self.options)
+
+        self.MassReg_hadhad_session = rt.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/hadhad_H20000_Z25000_Lambda0.01_FLAT500k_genPtCut400.onnx', self.options)
+        self.MassReg_hadel_session = rt.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/hadel_H15000_Z15000_Lambda0.1_hadel_FLAT300k_genPtCut300.onnx', self.options)
+        self.MassReg_hadmu_session = rt.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/hadmu_H9000_Z15000_Lambda0.01_hadmu_FLAT300k_genPtCut300.onnx', self.options)
 
         self.log_pf = []
         self.log_sv = []

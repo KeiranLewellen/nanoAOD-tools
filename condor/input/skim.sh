@@ -7,7 +7,6 @@ DATASET=${!i}; i=$((i+1))
 SHORT=${!i}; i=$((i+1))
 YEAR=${!i}; i=$((i+1))
 ISMC=${!i}; i=$((i+1))
-ISINFER=${!i}; i=$((i+1))
 ICHUNK=${!i}; i=$((i+1))
 SUBDATE=${!i};i=$((i+1))
 CONVERT=${!i};i=$((i+1))
@@ -33,8 +32,8 @@ source /cvmfs/cms.cern.ch/cmsset_default.sh
 if [ ${CONVERT} -eq 1 ]; then
        # Convert inputs from EDM to flat nano trees
        printf "%s\n" "${FILES[@]}" > files.txt
-       scramv1 project CMSSW CMSSW_10_6_6
-       pushd CMSSW_10_6_6/src
+       scramv1 project CMSSW CMSSW_11_2_1
+       pushd CMSSW_11_2_1/src
        eval `scramv1 runtime -sh`
        popd
        cmsRun nano_from_edm_cfg.py year=${YEAR} inputFiles_load=files.txt
@@ -87,33 +86,11 @@ echo ''
 echo '--- Starting skim'
 echo "${FILES[@]}"
 echo "${CUT}"
-postfix="_post-process"
-IFS=" "
-splitfiles=($FILES)
-unset IFS
-
-for f in "${splitfiles[@]}"
-do
-  IFS="/"
-  split=($f) #$(echo $x | tr "/" " ")  
-  unset IFS
-  postfix="_post-process_${split[-4]}"
-  echo "start python $(date)"
-  #if [[ ${ISINFER} ]]
-  #then 
-  #  python scripts/nano_postproc.py tmp/ $f -I PhysicsTools.NanoAODTools.postprocessing.modules.ZprInference inferencer -c "${CUT}" -s "${postfix}" --bo scripts/keep_and_drop.txt
-  #else
-    python scripts/nano_postproc.py tmp/ $f -I PhysicsTools.NanoAODTools.postprocessing.modules.ZprTraining pfModule -c "${CUT}" -s "${postfix}" --bo scripts/keep_and_drop_training.txt
-  #fi
-
-  echo "done python $(date)"
-done
-
 
 echo "drop FatJetPFCands_*" >> drop_pfcands.txt
 
 echo "start python $(date)"
-python scripts/nano_postproc.py tmp/ ${FILES[@]} -I PhysicsTools.NanoAODTools.postprocessing.modules.HttInference_with_SV inferencer -c "${CUT}" -s "${DATASET}" --bo drop_pfcands.txt
+python3 scripts/nano_postproc.py tmp/ ${FILES[@]} -I PhysicsTools.NanoAODTools.postprocessing.modules.HttInference_with_SV inferencer -c "${CUT}" -s "${DATASET}" --bo drop_pfcands.txt
 echo "done python $(date)"
 #OUTDIR="/store/user/jkrupa/nanopost_process/${TAG}" 
 #/$(echo $DATASET | sed "s|/| |g" | awk '{print $1}')/${SHORT}/${SUBDATE}/1337/"
@@ -121,12 +98,11 @@ echo "done python $(date)"
 #echo "start copying $(date)"
 #for i in tmp/*; do xrdcp -f $i root://cmseos.fnal.gov/${OUTDIR}/; done
 echo "start hadd $(date)"
-#haddnano.py tree_${ICHUNK}.root tmp/*.root
-for f in tmp/*.root; do haddnano.py "${f%.root}_skim.root" "${f}"; done
+haddnano.py tree_${ICHUNK}.root tmp/*.root
+#for f in tmp/*.root; do haddnano.py "${f%.root}_skim.root" "${f}"; done
 echo "done hadd $(date)"
 echo "start copying $(date)"
-#xrdcp -f tree_${ICHUNK}.root root://cmseos.fnal.gov/${OUTDIR}/
-for i in tmp/*_skim.root; do xrdcp -f $i root://cmseos.fnal.gov/${OUTDIR}/; done
+xrdcp -f tree_${ICHUNK}.root root://cmseos.fnal.gov/${OUTDIR}/
+#for i in tmp/*_skim.root; do xrdcp -f $i root://cmseos.fnal.gov/${OUTDIR}/; done
 echo "done copying $(date)"
-
 rm -rf tmp/*

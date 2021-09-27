@@ -25,6 +25,19 @@ mergefactors = { "JetHT_pancakes-02_Run2017B-09Aug2019_UL2017-v1" : 5,
                  "SingleMuon_pancakes-02-withPF_Run2017D-09Aug2019_UL2017-v1" : 3,
                  "SingleMuon_pancakes-02-withPF_Run2017E-09Aug2019_UL2017-v1" : 3,
                  "SingleMuon_pancakes-02-withPF_Run2017F-09Aug2019_UL2017-v1" : 3,
+                 "MET_pancakes-02_Run2018A-12Nov2019_UL2018-v3" : 3,
+                 "MET_pancakes-02_Run2018B-12Nov2019_UL2018_rsb-v1" : 3,
+                 "MET_pancakes-02_Run2018C-12Nov2019_UL2018_rsb-v1" : 3,
+                 "MET_pancakes-02_Run2018D-12Nov2019_UL2018_rsb-v2" : 3,
+                 "EGamma_pancakes-02_Run2018A-12Nov2019_UL2018-v2" : 3,
+                 "EGamma_pancakes-02_Run2018B-12Nov2019_UL2018-v2" : 3,
+                 "EGamma_pancakes-02_Run2018C-12Nov2019_UL2018-v2" : 3,
+                 "EGamma_pancakes-02_Run2018D-12Nov2019_UL2018-v4" : 3,
+                 "SingleMuon_pancakes-02_Run2018A-12Nov2019_UL2018_rsb-v1" : 3,
+                 "SingleMuon_pancakes-02_Run2018B-12Nov2019_UL2018-v2" : 3,
+                 "SingleMuon_pancakes-02_Run2018C-12Nov2019_UL2018-v2" : 3,
+                 "SingleMuon_pancakes-02_Run2018D-12Nov2019_UL2018-v4" : 3,
+                 "DYJetsToLL_Pt-100To250_TuneCP5_13TeV-amcatnloFXFX-pythia8" : 10,
                  "DYJetsToLL_Pt-250To400_TuneCP5_13TeV-amcatnloFXFX-pythia8" : 5,
                  "DYJetsToLL_Pt-400To650_TuneCP5_13TeV-amcatnloFXFX-pythia8" : 5,
                  "DYJetsToLL_Pt-650ToInf_TuneCP5_13TeV-amcatnloFXFX-pythia8" : 5,
@@ -34,6 +47,11 @@ mergefactors = { "JetHT_pancakes-02_Run2017B-09Aug2019_UL2017-v1" : 5,
                  "QCD_HT1000to1500_TuneCP5_PSWeights_13TeV-madgraphMLM-pythia8" : 2,
                  "QCD_HT1500to2000_TuneCP5_PSWeights_13TeV-madgraphMLM-pythia8" : 1,
                  "QCD_HT2000toInf_TuneCP5_PSWeights_13TeV-madgraphMLM-pythia8" : 2,
+                 "QCD_HT500to700_TuneCP5_13TeV-madgraphMLM-pythia8" : 3,
+                 "QCD_HT700to1000_TuneCP5_13TeV-madgraphMLM-pythia8" : 3,
+                 "QCD_HT1000to1500_TuneCP5_13TeV-madgraphMLM-pythia8" : 2,
+                 "QCD_HT1500to2000_TuneCP5_13TeV-madgraphMLM-pythia8" : 1,
+                 "QCD_HT2000toInf_TuneCP5_13TeV-madgraphMLM-pythia8" : 2,
                  "ZJetsToQQ_HT400to600_qc19_4j_TuneCP5_13TeV-madgraphMLM-pythia8" : 8, 
                  "ZJetsToQQ_HT600to800_qc19_4j_TuneCP5_13TeV-madgraphMLM-pythia8" : 8, 
                  "ZJetsToQQ_HT-800toInf_qc19_4j_TuneCP5_13TeV-madgraphMLM-pythia8" : 8,
@@ -49,6 +67,12 @@ mergefactors = { "JetHT_pancakes-02_Run2017B-09Aug2019_UL2017-v1" : 5,
                  "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8" : 10,
                  "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8" : 5,
                  "ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8" : 5,
+                 "ST_s-channel_4f_hadronicDecays_TuneCP5_13TeV-madgraph-pythia8" : 10,
+                 "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-madgraph-pythia8" : 10,
+                 "ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8" : 10,
+                 "ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8" : 10,
+                 "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8" : 5,
+                 "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8" : 5,
                  "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8" : 2,
                  "WJetsToLNu_HT-70To100_TuneCP5_13TeV-madgraphMLM-pythia8" : 5, 
                  "WJetsToLNu_HT-100To200_TuneCP5_13TeV-madgraphMLM-pythia8" : 5, 
@@ -69,9 +93,10 @@ mergefactors = { "JetHT_pancakes-02_Run2017B-09Aug2019_UL2017-v1" : 5,
                  "ttHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8" : 5,
                  "GluGluHTauTau_13TeV" : 20,
                  "boostedTau_QCD_HT700to1000_TuneCP5_PSWeights_13TeV-madgraphMLM-pythia8" : 2,
+                 "boostedTau_DYJetsToLL_Pt-400To650_TuneCP5_13TeV-amcatnloFXFX-pythia8" : 2,
                  "boostedTau_WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8" : 2,
                  "boostedTau_GluGluHTauTau_boostedTaua_13TeV_user" : 10,
-
+                 "GluGluHToWWToLNuQQ_M125_TuneCP5_PSweight_13TeV-powheg2-jhugen727-pythia8" : 2
                 } 
 for year in ['2017','2018']:
     of = open('fileset_%s.json'%year,'w')
@@ -79,7 +104,7 @@ for year in ['2017','2018']:
     endi = len(glob.glob(year+'/*'))-1
     for i, s in enumerate(glob.glob(year+'/*')):
         if s.replace('.txt','').replace(year+'/','') not in mergefactors:
-            print("%s not found, skipping...",s.replace('.txt','').replace(year+'/',''))
+            print("%s not found, skipping..."%(s.replace('.txt','').replace(year+'/','')))
             continue 
     
         of.write('\n\t{')
