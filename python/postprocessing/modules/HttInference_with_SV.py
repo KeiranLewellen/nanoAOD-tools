@@ -17,12 +17,14 @@ class inferencerClass(Module):
         self.Nparts = 30
         self.Nsvs = 5
         self.Ntaus = 3
+        self.Nelecs = 2
+        self.Nmuons = 2
         base = os.environ['CMSSW_BASE']
 
         self.model5p1_hadhad_multi_session = onnxruntime.InferenceSession(
             base + '/src/PhysicsTools/NanoAODTools/data/IN_hadhad_v5p1_multiclass,on_QCD_WJets_noLep,fillFactor=1:2:1,eventData,take_1,model.onnx')
 
-        self.model6_hadhad_multi_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_hadhad_v6_multiclass,on_QCD_WJets_noLep,fillFactor=1:2:1,allData,metCut40,take_1,model.onnx')
+        self.model6_hadhad_multi_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_hadhad_v6,on_QCD_WJets_noLep,1:1_5:0_75,multiclass,allData,metCut40,take_1,model.onnx')
 
         self.IN_hadel_v6_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_hadel_v6,on_TTbar_WJets,ohe,allData,metCut40,take_1,model.onnx')
         self.IN_hadmu_v6_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_hadmu_v6,on_TTbar_WJets,ohe,allData,metCut40,take_1,model.onnx')
@@ -469,33 +471,33 @@ class inferencerClass(Module):
 
             IN_hadel_v6[0] = float(
                 self.IN_hadel_v6_session.run([self.IN_hadel_v6_session.get_outputs()[0].name],
-                                             {self.IN_hadel_v6_session.get_inputs()[0].name: evtData,
-                                              self.IN_hadel_v6_session.get_inputs()[1].name: pfDataMore,
-                                              self.IN_hadel_v6_session.get_inputs()[2].name: svData,
-                                              self.IN_hadel_v6_session.get_inputs()[3].name: elecData,
+                                             {self.IN_hadel_v6_session.get_inputs()[0].name: elecData,
+                                              self.IN_hadel_v6_session.get_inputs()[1].name: evtData,
+                                              self.IN_hadel_v6_session.get_inputs()[2].name: pfDataMore,
+                                              self.IN_hadel_v6_session.get_inputs()[3].name: svData,
                                               self.IN_hadel_v6_session.get_inputs()[4].name: tauData})[0][0])
 
             IN_hadmu_v6[0] = float(
                 self.IN_hadmu_v6_session.run([self.IN_hadmu_v6_session.get_outputs()[0].name],
                                              {self.IN_hadmu_v6_session.get_inputs()[0].name: evtData,
-                                              self.IN_hadmu_v6_session.get_inputs()[1].name: pfDataMore,
-                                              self.IN_hadmu_v6_session.get_inputs()[2].name: svData,
-                                              self.IN_hadmu_v6_session.get_inputs()[3].name: muonData,
+                                              self.IN_hadmu_v6_session.get_inputs()[1].name: muonData,
+                                              self.IN_hadmu_v6_session.get_inputs()[2].name: pfDataMore,
+                                              self.IN_hadmu_v6_session.get_inputs()[3].name: svData,
                                               self.IN_hadmu_v6_session.get_inputs()[4].name: tauData})[0][0])
 
             Ztagger_Zee_Zhe_v6[0] = float(
                 self.Ztagger_Zee_Zhe_v6_session.run([self.Ztagger_Zee_Zhe_v6_session.get_outputs()[0].name],
-                                                    {self.Ztagger_Zee_Zhe_v6_session.get_inputs()[0].name: evtData,
-                                                     self.Ztagger_Zee_Zhe_v6_session.get_inputs()[1].name: pfDataMore,
-                                                     self.Ztagger_Zee_Zhe_v6_session.get_inputs()[2].name: svData,
-                                                     self.Ztagger_Zee_Zhe_v6_session.get_inputs()[3].name: elecData,
+                                                    {self.Ztagger_Zee_Zhe_v6_session.get_inputs()[0].name: elecData,
+                                                     self.Ztagger_Zee_Zhe_v6_session.get_inputs()[1].name: evtData,
+                                                     self.Ztagger_Zee_Zhe_v6_session.get_inputs()[2].name: pfDataMore,
+                                                     self.Ztagger_Zee_Zhe_v6_session.get_inputs()[3].name: svData,
                                                      self.Ztagger_Zee_Zhe_v6_session.get_inputs()[4].name: tauData})[0][0])
             Ztagger_Zmm_Zhm_v6[0] = float(
                 self.Ztagger_Zmm_Zhm_v6_session.run([self.Ztagger_Zmm_Zhm_v6_session.get_outputs()[0].name],
                                                     {self.Ztagger_Zmm_Zhm_v6_session.get_inputs()[0].name: evtData,
-                                                     self.Ztagger_Zmm_Zhm_v6_session.get_inputs()[1].name: pfDataMore,
-                                                     self.Ztagger_Zmm_Zhm_v6_session.get_inputs()[2].name: svData,
-                                                     self.Ztagger_Zmm_Zhm_v6_session.get_inputs()[3].name: muonData,
+                                                     self.Ztagger_Zmm_Zhm_v6_session.get_inputs()[1].name: muonData,
+                                                     self.Ztagger_Zmm_Zhm_v6_session.get_inputs()[2].name: pfDataMore,
+                                                     self.Ztagger_Zmm_Zhm_v6_session.get_inputs()[3].name: svData,
                                                      self.Ztagger_Zmm_Zhm_v6_session.get_inputs()[4].name: tauData})[0][0])
 
 
