@@ -22,7 +22,7 @@ class inferencerClass(Module):
         base = os.environ['CMSSW_BASE']
 
         self.model5p1_hadhad_multi_session = onnxruntime.InferenceSession(
-            base + '/src/PhysicsTools/NanoAODTools/data/IN_hadhad_v5p1_multiclass,on_QCD_WJets_noLep,fillFactor=1:2:1,eventData,take_1,model.onnx')
+            base + '/src/PhysicsTools/NanoAODTools/data/IN_hadhad_v5p1_multiclass,on_QCD_WJets_noLep,fillFactor=1:1_5:0_75,metCut,take_1,model.onnx')
 
         self.model6_hadhad_multi_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_hadhad_v6,on_QCD_WJets_noLep,1:1_5:0_75,multiclass,allData,metCut40,take_1,model.onnx')
 
@@ -30,7 +30,9 @@ class inferencerClass(Module):
         self.IN_hadmu_v6_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_hadmu_v6,on_TTbar_WJets,ohe,allData,metCut40,take_1,model.onnx')
 
         self.Ztagger_Zee_Zhe_v6_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_Zhe_v6,on_Zee_oneEl_Zhe,ohe,allData,metCut20,take_3,model.onnx')
-        self.Ztagger_Zmm_Zhm_v6_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_Zhm_v6,on_Zmm_oneMu_Zhm,ohe,allData,metCut20,take_1,model.onnx')
+
+        self.Ztagger_Zee_Zhe_v6_multi_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_Zhe_v6,multiclass,on_Zhe,QCD_oneEl,Zee_oneEl,ohe,allData,metCut20,take_1,model.onnx')
+        self.Ztagger_Zmm_Zhm_v6_multi_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/IN_Zhm_v6,multiclass,on_Zhm,QCD_oneMu,Zmm_oneMu,ohe,allData,metCut20,take_1,model.onnx')
 
         self.MassReg_hadhad_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/hadhad_H20000_Z25000_Lambda0.01_FLAT500k_genPtCut400.onnx')
         self.MassReg_hadel_session = onnxruntime.InferenceSession(base+'/src/PhysicsTools/NanoAODTools/data/hadel_H15000_Z15000_Lambda0.1_hadel_FLAT300k_genPtCut300.onnx')
@@ -54,15 +56,22 @@ class inferencerClass(Module):
         self.out.branch("IN_hadmu_v6", "F", 1)
 
         self.out.branch("Ztagger_v6_Zee_Zhe", "F", 1)
-        self.out.branch("Ztagger_v6_Zmm_Zhm", "F", 1)
+
+        self.out.branch("Ztagger_hadel_v6_multi_Zhe", "F", 1)
+        self.out.branch("Ztagger_hadel_v6_multi_QCD", "F", 1)
+        self.out.branch("Ztagger_hadel_v6_multi_Zee", "F", 1)
+
+        self.out.branch("Ztagger_hadmu_v6_multi_Zhm", "F", 1)
+        self.out.branch("Ztagger_hadmu_v6_multi_QCD", "F", 1)
+        self.out.branch("Ztagger_hadmu_v6_multi_Zmm", "F", 1)
 
         self.out.branch("IN_hadhad_v6_multi_Higgs", "F", 1)
         self.out.branch("IN_hadhad_v6_multi_QCD", "F", 1)
         self.out.branch("IN_hadhad_v6_multi_WJets", "F", 1)
 
-        self.out.branch("IN_hadhad_v5p1_multi_Higgs", "F", 1)
-        self.out.branch("IN_hadhad_v5p1_multi_QCD", "F", 1)
-        self.out.branch("IN_hadhad_v5p1_multi_WJets", "F", 1)
+        self.out.branch("IN_hadhad_v5p1_multi_metCut_Higgs", "F", 1)
+        self.out.branch("IN_hadhad_v5p1_multi_metCut_QCD", "F", 1)
+        self.out.branch("IN_hadhad_v5p1_multi_metCut_WJets", "F", 1)
 
         self.out.branch("MassReg_hadhad_mass", "F", 1)
         self.out.branch("MassReg_hadel_mass", "F", 1)
@@ -96,7 +105,14 @@ class inferencerClass(Module):
         pupmet = Object(event, "PuppiMET")
 
         Ztagger_Zee_Zhe_v6 = np.full(1, -1., dtype=np.float32)
-        Ztagger_Zmm_Zhm_v6 = np.full(1, -1., dtype=np.float32)
+
+        Ztagger_hadel_v6_multi_Zhe = np.full(1, -1., dtype=np.float32)
+        Ztagger_hadel_v6_multi_QCD = np.full(1, -1., dtype=np.float32)
+        Ztagger_hadel_v6_multi_Zee = np.full(1, -1., dtype=np.float32)
+
+        Ztagger_hadmu_v6_multi_Zhm = np.full(1, -1., dtype=np.float32)
+        Ztagger_hadmu_v6_multi_QCD = np.full(1, -1., dtype=np.float32)
+        Ztagger_hadmu_v6_multi_Zmm = np.full(1, -1., dtype=np.float32)
 
         IN_hadel_v6 = np.full(1, -1., dtype=np.float32)
         IN_hadmu_v6 = np.full(1, -1., dtype=np.float32)
@@ -429,7 +445,7 @@ class inferencerClass(Module):
             pfDataMore = np.transpose(pfDataMore)
             pfDataMore = np.expand_dims(pfDataMore, axis=0)
 
-            svData = self.reshape_data([svdlen,svdlenSig, svdxy, svdxySig, svchi2, svpAngle, svx, svy, svz, svpt, svmass, sveta, svphi])
+            svData = self.reshape_data([svdlen, svdlenSig, svdxy, svdxySig, svchi2, svpAngle, svx, svy, svz, svpt, svmass, sveta, svphi])
             elecData = self.reshape_data([Electron_charge, Electron_convVeto, Electron_deltaEtaSC, Electron_dr03EcalRecHitSumEt, Electron_dr03HcalDepth1TowerSumEt, Electron_dr03TkSumPt, Electron_dxy, Electron_dxyErr, Electron_dz, Electron_dzErr, Electron_eInvMinusPInv, Electron_eta, Electron_hoe, Electron_ip3d, Electron_lostHits, Electron_phi, Electron_pt, Electron_r9, Electron_sieie, Electron_sip3d])
             muonData = self.reshape_data([Muon_charge, Muon_dxy, Muon_dxyErr, Muon_dz, Muon_dzErr, Muon_eta, Muon_ip3d, Muon_nStations, Muon_nTrackerLayers, Muon_pfRelIso03_all, Muon_pfRelIso03_chg, Muon_phi, Muon_pt, Muon_segmentComp, Muon_sip3d, Muon_tkRelIso])
             tauData = self.reshape_data([tau_charge, tau_chargedIso, tau_dxy, tau_dz, tau_eta, tau_leadTkDeltaEta, tau_leadTkDeltaPhi, tau_leadTkPtOverTauPt, tau_mass, tau_neutralIso, tau_phi, tau_photonsOutsideSignalCone, tau_pt, tau_rawAntiEle, tau_rawIso, tau_rawIsodR03, tau_rawMVAoldDM2017v2, tau_rawMVAoldDMdR032017v2])
@@ -492,14 +508,30 @@ class inferencerClass(Module):
                                                      self.Ztagger_Zee_Zhe_v6_session.get_inputs()[2].name: pfDataMore,
                                                      self.Ztagger_Zee_Zhe_v6_session.get_inputs()[3].name: svData,
                                                      self.Ztagger_Zee_Zhe_v6_session.get_inputs()[4].name: tauData})[0][0])
-            Ztagger_Zmm_Zhm_v6[0] = float(
-                self.Ztagger_Zmm_Zhm_v6_session.run([self.Ztagger_Zmm_Zhm_v6_session.get_outputs()[0].name],
+
+            Ztagger_Zee_Zhe_v6_multi_pred = self.Ztagger_Zee_Zhe_v6_multi_session.run(
+                                                    [self.Ztagger_Zee_Zhe_v6_session.get_outputs()[0].name],
+                                                    {self.Ztagger_Zee_Zhe_v6_session.get_inputs()[0].name: elecData,
+                                                     self.Ztagger_Zee_Zhe_v6_session.get_inputs()[1].name: evtZ,
+                                                     self.Ztagger_Zee_Zhe_v6_session.get_inputs()[2].name: pfDataMore,
+                                                     self.Ztagger_Zee_Zhe_v6_session.get_inputs()[3].name: svData,
+                                                     self.Ztagger_Zee_Zhe_v6_session.get_inputs()[4].name: tauData})
+
+            Ztagger_hadel_v6_multi_Zhe[0] = float(Ztagger_Zee_Zhe_v6_multi_pred[0][0][0])
+            Ztagger_hadel_v6_multi_QCD[0] = float(Ztagger_Zee_Zhe_v6_multi_pred[0][0][1])
+            Ztagger_hadel_v6_multi_Zee[0] = float(Ztagger_Zee_Zhe_v6_multi_pred[0][0][2])
+
+            Ztagger_Zmm_Zhm_v6_multi_pred = self.Ztagger_Zmm_Zhm_v6_multi_session.run(
+                                                    [self.Ztagger_Zmm_Zhm_v6_session.get_outputs()[0].name],
                                                     {self.Ztagger_Zmm_Zhm_v6_session.get_inputs()[0].name: evtZ,
                                                      self.Ztagger_Zmm_Zhm_v6_session.get_inputs()[1].name: muonData,
                                                      self.Ztagger_Zmm_Zhm_v6_session.get_inputs()[2].name: pfDataMore,
                                                      self.Ztagger_Zmm_Zhm_v6_session.get_inputs()[3].name: svData,
-                                                     self.Ztagger_Zmm_Zhm_v6_session.get_inputs()[4].name: tauData})[0][0])
+                                                     self.Ztagger_Zmm_Zhm_v6_session.get_inputs()[4].name: tauData})
 
+            Ztagger_hadmu_v6_multi_Zhm[0] = float(Ztagger_Zmm_Zhm_v6_multi_pred[0][0][0])
+            Ztagger_hadmu_v6_multi_QCD[0] = float(Ztagger_Zmm_Zhm_v6_multi_pred[0][0][1])
+            Ztagger_hadmu_v6_multi_Zmm[0] = float(Ztagger_Zmm_Zhm_v6_multi_pred[0][0][2])
 
             IN_hadhad_v6_multi_pred = self.model6_hadhad_multi_session.run(
                 [self.model6_hadhad_multi_session.get_outputs()[0].name],
@@ -555,15 +587,22 @@ class inferencerClass(Module):
         self.out.fillBranch("IN_hadmu_v6", IN_hadmu_v6)
 
         self.out.fillBranch("Ztagger_v6_Zee_Zhe", Ztagger_Zee_Zhe_v6)
-        self.out.fillBranch("Ztagger_v6_Zmm_Zhm", Ztagger_Zmm_Zhm_v6)
+
+        self.out.fillBranch("Ztagger_hadel_v6_multi_Zhe", Ztagger_hadel_v6_multi_Zhe)
+        self.out.fillBranch("Ztagger_hadel_v6_multi_QCD", Ztagger_hadel_v6_multi_QCD)
+        self.out.fillBranch("Ztagger_hadel_v6_multi_Zee", Ztagger_hadel_v6_multi_Zee)
+
+        self.out.fillBranch("Ztagger_hadmu_v6_multi_Zhm", Ztagger_hadmu_v6_multi_Zhm)
+        self.out.fillBranch("Ztagger_hadmu_v6_multi_QCD", Ztagger_hadmu_v6_multi_QCD)
+        self.out.fillBranch("Ztagger_hadmu_v6_multi_Zmm", Ztagger_hadmu_v6_multi_Zmm)
 
         self.out.fillBranch("IN_hadhad_v6_multi_Higgs", IN_hadhad_v6_multi_Higgs)
         self.out.fillBranch("IN_hadhad_v6_multi_QCD", IN_hadhad_v6_multi_QCD)
         self.out.fillBranch("IN_hadhad_v6_multi_WJets", IN_hadhad_v6_multi_WJets)
 
-        self.out.fillBranch("IN_hadhad_v5p1_multi_Higgs", IN_hadhad_v5p1_multi_Higgs)
-        self.out.fillBranch("IN_hadhad_v5p1_multi_QCD", IN_hadhad_v5p1_multi_QCD)
-        self.out.fillBranch("IN_hadhad_v5p1_multi_WJets", IN_hadhad_v5p1_multi_WJets)
+        self.out.fillBranch("IN_hadhad_v5p1_multi_metCut_Higgs", IN_hadhad_v5p1_multi_Higgs)
+        self.out.fillBranch("IN_hadhad_v5p1_multi_metCut_QCD", IN_hadhad_v5p1_multi_QCD)
+        self.out.fillBranch("IN_hadhad_v5p1_multi_metCut_WJets", IN_hadhad_v5p1_multi_WJets)
 
         self.out.fillBranch("MassReg_hadhad_mass", MassReg_hadhad_mass)
         self.out.fillBranch("MassReg_hadel_mass", MassReg_hadel_mass)
